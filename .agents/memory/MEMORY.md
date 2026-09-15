@@ -1,0 +1,2 @@
+- [Package firewall](package-firewall.md) — when an imported lockfile is blocked, update the blocked dev tool to a current safe release before reinstalling.
+- [Generated API schemas](generated-api-schemas.md) — keep generated runtime validators compatible with the workspace’s installed Zod major version.

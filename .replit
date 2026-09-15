@@ -1,0 +1,87 @@
+modules = ["nodejs-24", "python-base-3.13", "postgresql-16"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 80
+
+[[ports]]
+localPort = 8082
+externalPort = 3002
+
+[[ports]]
+localPort = 8083
+externalPort = 3003
+
+[[ports]]
+localPort = 8084
+externalPort = 6000
+
+[[ports]]
+localPort = 8085
+externalPort = 5000
+
+[[ports]]
+localPort = 8086
+externalPort = 8081
+
+[[ports]]
+localPort = 8087
+externalPort = 8099
+
+[[ports]]
+localPort = 24836
+externalPort = 3000
+
+[[ports]]
+localPort = 24837
+externalPort = 3001
+
+[[ports]]
+localPort = 24838
+externalPort = 4200
+
+[[ports]]
+localPort = 24839
+externalPort = 5173
+
+[[ports]]
+localPort = 24840
+externalPort = 6800
+
+[[ports]]
+localPort = 24841
+externalPort = 8008
+
+[[ports]]
+localPort = 24842
+externalPort = 8000
+
+[[ports]]
+localPort = 24843
+externalPort = 9000
+
+[nix]
+channel = "stable-25_05"

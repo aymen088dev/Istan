@@ -1,0 +1,357 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: ai
+    description: AI roster generation
+  - name: shared
+    description: Shared clubs and saved lineups
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /ai/squad-from-text:
+    post:
+      operationId: generateSquadFromText
+      tags: [ai]
+      summary: Generate a roster from raw text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SquadFromTextRequest"
+      responses:
+        "200":
+          description: Generated roster
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SquadGenerationResponse"
+        "400":
+          description: Invalid input
+        "502":
+          description: AI provider error
+  /ai/squad-from-criteria:
+    post:
+      operationId: generateSquadFromCriteria
+      tags: [ai]
+      summary: Generate a roster from criteria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SquadFromCriteriaRequest"
+      responses:
+        "200":
+          description: Generated roster
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SquadGenerationResponse"
+        "502":
+          description: AI provider error
+  /ai/best-xi:
+    post:
+      operationId: suggestBestXi
+      tags: [ai]
+      summary: Suggest an ordering for the best XI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BestXIRequest"
+      responses:
+        "200":
+          description: Suggested player ordering
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BestXIResponse"
+        "400":
+          description: Invalid input
+        "502":
+          description: AI provider error
+  /clubs:
+    get:
+      operationId: listSharedClubs
+      tags: [shared]
+      summary: List shared clubs and rosters
+      responses:
+        "200":
+          description: Shared clubs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedClubsResponse"
+  /clubs/{id}:
+    put:
+      operationId: updateSharedClub
+      tags: [shared]
+      summary: Save a shared club and roster
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SharedClub"
+      responses:
+        "200":
+          description: Updated club
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedClubResponse"
+        "400":
+          description: Invalid club
+    delete:
+      operationId: deleteSharedClub
+      tags: [shared]
+      summary: Delete a shared club
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Club deleted
+  /compositions:
+    get:
+      operationId: listSharedCompositions
+      tags: [shared]
+      summary: List shared saved lineups
+      responses:
+        "200":
+          description: Shared lineups
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedCompositionsResponse"
+  /compositions/{id}:
+    put:
+      operationId: updateSharedComposition
+      tags: [shared]
+      summary: Save a shared lineup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SharedComposition"
+      responses:
+        "200":
+          description: Updated lineup
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedCompositionResponse"
+        "400":
+          description: Invalid lineup
+    delete:
+      operationId: deleteSharedComposition
+      tags: [shared]
+      summary: Delete a shared lineup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Lineup deleted
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    SquadPlayer:
+      type: object
+      properties:
+        name: { type: string }
+        age: { type: integer, minimum: 15, maximum: 45 }
+        rating: { type: integer, minimum: 1, maximum: 99 }
+        nationality: { type: string }
+        position: { type: string }
+        number: { type: string }
+      required: [name, age, rating, nationality, position, number]
+    SquadGenerationResponse:
+      type: object
+      properties:
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/SquadPlayer"
+      required: [players]
+    SquadFromTextRequest:
+      type: object
+      properties:
+        rawText: { type: string, minLength: 1 }
+        sport: { type: string }
+        clubName: { type: string }
+      required: [rawText]
+    SquadFromCriteriaRequest:
+      type: object
+      properties:
+        criteria:
+          type: object
+          properties:
+            sport: { type: string }
+            clubName: { type: string }
+            count: { type: integer, minimum: 1, maximum: 40 }
+            ageMin: { type: integer, minimum: 15, maximum: 45 }
+            ageMax: { type: integer, minimum: 15, maximum: 45 }
+            ratingMin: { type: integer, minimum: 1, maximum: 99 }
+            ratingMax: { type: integer, minimum: 1, maximum: 99 }
+            nationality: { type: string }
+            positions: { type: string }
+          required: [sport, count]
+      required: [criteria]
+    BestXIPlayer:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        position: { type: string }
+        rating: { type: integer, minimum: 1, maximum: 99 }
+        number: { type: string }
+      required: [id, name, position, rating, number]
+    BestXIRequest:
+      type: object
+      properties:
+        sport: { type: string }
+        formation: { type: string }
+        players:
+          type: array
+          maxItems: 40
+          items:
+            $ref: "#/components/schemas/BestXIPlayer"
+      required: [sport, formation, players]
+    BestXIResponse:
+      type: object
+      properties:
+        playerIds:
+          type: array
+          items: { type: string }
+      required: [playerIds]
+    SharedRosterPlayer:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        age: { type: integer }
+        rating: { type: integer }
+        nationality: { type: string }
+        position: { type: string }
+        number: { type: string }
+      required: [id, name, age, rating, nationality, position, number]
+    SharedClub:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        logo: { type: string }
+        jerseyColor: { type: string }
+        secondaryColor: { type: string }
+        accentColor: { type: string }
+        numberColor: { type: string }
+        jerseyStyle: { type: string }
+        backgroundId: { type: string }
+        category: { type: string, enum: [club, selection] }
+        roster:
+          type: array
+          items:
+            $ref: "#/components/schemas/SharedRosterPlayer"
+      required: [name, jerseyColor, secondaryColor, accentColor, numberColor, jerseyStyle, backgroundId, category]
+    SharedClubResponse:
+      type: object
+      properties:
+        club:
+          $ref: "#/components/schemas/SharedClub"
+      required: [club]
+    SharedClubsResponse:
+      type: object
+      properties:
+        clubs:
+          type: array
+          items:
+            $ref: "#/components/schemas/SharedClub"
+      required: [clubs]
+    SharedPlayer:
+      type: object
+      additionalProperties: true
+    SharedComposition:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        savedAt: { type: integer }
+        sport: { type: string, enum: [football, hockey] }
+        formation: { type: string }
+        title: { type: string }
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/SharedPlayer"
+        bench:
+          type: array
+          items:
+            $ref: "#/components/schemas/SharedPlayer"
+        jerseyColor: { type: string }
+        secondaryColor: { type: string }
+        accentColor: { type: string }
+        numberColor: { type: string }
+        jerseyStyle: { type: string }
+        backgroundId: { type: string }
+        showBench: { type: boolean }
+        showDetails: { type: boolean }
+      required: [name, sport, formation, title, players, bench, jerseyColor, secondaryColor, accentColor, jerseyStyle, backgroundId, showBench, showDetails]
+    SharedCompositionResponse:
+      type: object
+      properties:
+        composition:
+          $ref: "#/components/schemas/SharedComposition"
+      required: [composition]
+    SharedCompositionsResponse:
+      type: object
+      properties:
+        compositions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SharedComposition"
+      required: [compositions]
+

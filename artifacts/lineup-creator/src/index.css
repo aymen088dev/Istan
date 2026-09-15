@@ -1,0 +1,574 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
+  --opaque-button-border-intensity: 9; 
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .09);
+  --background: 220 20% 8%; 
+  --foreground: 0 0% 100%;
+  --border: 220 20% 15%;
+  --card: 220 20% 10%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 220 20% 15%;
+  --sidebar: 220 20% 10%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 220 20% 15%;
+  --sidebar-primary: 142 70% 50%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 220 20% 15%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 142 70% 50%;
+  --popover: 220 20% 10%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 220 20% 15%;
+  --primary: 142 70% 50%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 220 20% 15%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 220 20% 15%;
+  --muted-foreground: 220 10% 60%;
+  --accent: 220 20% 18%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 220 20% 18%;
+  --ring: 142 70% 50%;
+  --app-font-sans: 'Space Grotesk', 'Inter', sans-serif;
+  --app-font-serif: Georgia, serif;
+  --app-font-mono: Menlo, monospace;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply font-sans antialiased bg-background text-foreground; }
+  html { height: 100%; }
+  body { height: 100%; }
+  #root { height: 100%; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* Smooth transitions for sidebar */
+.sidebar-slide {
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+/* Color input styling */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
+
+/* Range input */
+input[type="range"] {
+  accent-color: hsl(var(--primary));
+}
+
+/* Pulse animation for export */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(16,185,129,0.35); }
+  50% { box-shadow: 0 0 24px rgba(16,185,129,0.6); }
+}
+
+/* ========== FOOTBALL BACKGROUNDS ========== */
+
+/* Standard green pitch */
+.pitch-bg {
+  background-color: #2d6a30;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(0,0,0,0.15) 39px,
+      rgba(0,0,0,0.15) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(0,0,0,0.1) 39px,
+      rgba(0,0,0,0.1) 40px
+    ),
+    linear-gradient(180deg, #256b28 0%, #2e7d32 40%, #256b28 60%, #2e7d32 100%);
+}
+.pitch-bg::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.pitch-bg::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Night pitch */
+.pitch-bg-night {
+  background-color: #0d2b12;
+  background-image:
+    linear-gradient(180deg, #0d2b12 0%, #163d1a 50%, #0d2b12 100%),
+    radial-gradient(ellipse at top, rgba(255,255,255,0.04) 0%, transparent 70%);
+}
+.pitch-bg-night::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.pitch-bg-night::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Retro brown pitch */
+.pitch-bg-retro {
+  background-color: #5c4a1e;
+  background-image:
+    linear-gradient(180deg, #6b5520 0%, #7a6030 40%, #6b5520 60%, #5c4a1e 100%);
+}
+.pitch-bg-retro::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.pitch-bg-retro::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Indoor / Futsal */
+.pitch-bg-indoor {
+  background-color: #1a2a5e;
+  background-image:
+    linear-gradient(180deg, #1a2a5e 0%, #233580 50%, #1a2a5e 100%);
+}
+.pitch-bg-indoor::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.pitch-bg-indoor::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px; height: 110px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Red turf */
+.pitch-bg-red {
+  background-color: #8b1a1a;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(0,0,0,0.12) 39px,
+      rgba(0,0,0,0.12) 40px
+    ),
+    linear-gradient(180deg, #7a1515 0%, #8b1a1a 50%, #7a1515 100%);
+}
+.pitch-bg-red::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.pitch-bg-red::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Minimal flat */
+.pitch-bg-minimal {
+  background-color: #1e4620;
+}
+.pitch-bg-minimal::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.pitch-bg-minimal::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px; height: 100px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Gold pitch */
+.pitch-bg-gold {
+  background-color: #7a5c00;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      rgba(0,0,0,0.12) 39px, rgba(0,0,0,0.12) 40px
+    ),
+    linear-gradient(180deg, #8a6800 0%, #a07800 40%, #8a6800 60%, #7a5c00 100%);
+
+}
+.pitch-bg-gold::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(255,255,200,0.35); transform: translateY(-50%); pointer-events: none;
+}
+.pitch-bg-gold::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,200,0.3); border-radius: 50%; pointer-events: none;
+}
+
+/* Navy pitch */
+.pitch-bg-navy {
+  background-color: #0a1a3a;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      rgba(255,255,255,0.05) 39px, rgba(255,255,255,0.05) 40px
+    ),
+    linear-gradient(180deg, #0a1a3a 0%, #122050 40%, #0a1a3a 100%);
+
+}
+.pitch-bg-navy::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(255,255,255,0.2); transform: translateY(-50%); pointer-events: none;
+}
+.pitch-bg-navy::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: none;
+}
+
+/* Purple pitch */
+.pitch-bg-purple {
+  background-color: #3a0a5c;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      rgba(255,255,255,0.05) 39px, rgba(255,255,255,0.05) 40px
+    ),
+    linear-gradient(180deg, #3a0a5c 0%, #4d1278 40%, #3a0a5c 100%);
+
+}
+.pitch-bg-purple::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(200,150,255,0.3); transform: translateY(-50%); pointer-events: none;
+}
+.pitch-bg-purple::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 110px; height: 110px;
+  border: 2px solid rgba(200,150,255,0.25); border-radius: 50%; pointer-events: none;
+}
+
+/* Dark slate pitch */
+.pitch-bg-dark {
+  background-color: #1a1a2e;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px
+    ),
+    linear-gradient(180deg, #16213e 0%, #1a1a2e 50%, #16213e 100%);
+
+}
+.pitch-bg-dark::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(255,255,255,0.12); transform: translateY(-50%); pointer-events: none;
+}
+.pitch-bg-dark::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 110px; height: 110px;
+  border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none;
+}
+
+/* Orange pitch */
+.pitch-bg-orange {
+  background-color: #7c2d00;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      rgba(0,0,0,0.12) 39px, rgba(0,0,0,0.12) 40px
+    ),
+    linear-gradient(180deg, #7c2d00 0%, #9a3800 40%, #7c2d00 100%);
+
+}
+.pitch-bg-orange::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(255,200,100,0.3); transform: translateY(-50%); pointer-events: none;
+}
+.pitch-bg-orange::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 110px; height: 110px;
+  border: 2px solid rgba(255,200,100,0.25); border-radius: 50%; pointer-events: none;
+}
+
+/* Teal / turquoise pitch */
+.pitch-bg-teal {
+  background-color: #0a4a4a;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      rgba(0,0,0,0.1) 39px, rgba(0,0,0,0.1) 40px
+    ),
+    linear-gradient(180deg, #0a4a4a 0%, #0d5c5c 40%, #0a4a4a 100%);
+
+}
+.pitch-bg-teal::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(100,255,220,0.3); transform: translateY(-50%); pointer-events: none;
+}
+.pitch-bg-teal::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 110px; height: 110px;
+  border: 2px solid rgba(100,255,220,0.25); border-radius: 50%; pointer-events: none;
+}
+
+/* ========== HOCKEY BACKGROUNDS ========== */
+
+/* Blue ice */
+.rink-bg {
+  background-color: #cce8f4;
+  background-image: linear-gradient(180deg, #d6edf7 0%, #b8dff0 50%, #cce8f4 100%);
+}
+.rink-bg::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  background: #d32f2f;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.rink-bg::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  border: 2px solid #0277bd;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Classic white ice */
+.rink-bg-white {
+  background-color: #f0f4f8;
+  background-image: linear-gradient(180deg, #ffffff 0%, #e8eef4 50%, #f0f4f8 100%);
+}
+.rink-bg-white::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  background: #c62828;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.rink-bg-white::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  border: 2px solid #1565c0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Dark / night rink */
+.rink-bg-dark {
+  background-color: #0a1628;
+  background-image: linear-gradient(180deg, #0a1628 0%, #0f2040 50%, #0a1628 100%);
+}
+.rink-bg-dark::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  background: #ef5350;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.rink-bg-dark::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  border: 2px solid #42a5f5;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Vintage / yellowed ice */
+.rink-bg-vintage {
+  background-color: #f5e8c8;
+  background-image: linear-gradient(180deg, #efe0b0 0%, #f5e8c8 50%, #ecddb8 100%);
+}
+.rink-bg-vintage::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  background: #8d2b2b;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.rink-bg-vintage::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  border: 2px solid #4a6fa5;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Red hockey rink */
+.rink-bg-red {
+  background-color: #3a0a0a;
+  background-image: linear-gradient(180deg, #3a0a0a 0%, #4d1212 50%, #3a0a0a 100%);
+
+}
+.rink-bg-red::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 4px; background: rgba(255,100,100,0.5); transform: translateY(-50%); pointer-events: none;
+}
+.rink-bg-red::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 80px; height: 80px;
+  border: 2px solid rgba(255,120,120,0.4); border-radius: 50%; pointer-events: none;
+}
+
+/* Gold hockey rink */
+.rink-bg-gold {
+  background-color: #ffe599;
+  background-image: linear-gradient(180deg, #ffe599 0%, #ffd966 50%, #ffe599 100%);
+
+}
+.rink-bg-gold::before {
+  content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  height: 4px; background: #c8860a; transform: translateY(-50%); pointer-events: none;
+}
+.rink-bg-gold::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 80px; height: 80px;
+  border: 2px solid #a06608; border-radius: 50%; pointer-events: none;
+}

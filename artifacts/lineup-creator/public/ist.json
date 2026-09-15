@@ -1,0 +1,17 @@
+{
+  "country": "Istanmusta",
+  "code": "ISTANMUSTA",
+  "flagFile": "istanmusta-flag.png",
+  "firstNames": [
+    "Aren", "Mira", "Neris", "Tovan", "Sela", "Ilan", "Veya", "Karel",
+    "Orin", "Luma", "Daren", "Nava", "Elio", "Soren", "Mika", "Talia",
+    "Rovan", "Elya", "Noren", "Vika", "Asto", "Liora", "Marek", "Siva",
+    "Eren", "Yuna", "Kiro", "Alen", "Nelia", "Tarek"
+  ],
+  "lastNames": [
+    "Musta", "Istan", "Varen", "Solan", "Neris", "Kovra", "Talen", "Orvik",
+    "Saren", "Velka", "Doran", "Lestin", "Miran", "Avel", "Rovan", "Kesta",
+    "Norek", "Silan", "Tovar", "Esten", "Loran", "Vesta", "Kalen", "Ostra",
+    "Marek", "Nivan", "Sorel", "Teren", "Ivara", "Zoran"
+  ]
+}
