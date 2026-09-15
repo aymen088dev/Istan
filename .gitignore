@@ -14,6 +14,7 @@ node_modules
 # Local deployment credentials — never commit this file.
 token.json
 data/lineup-shared.json
+data/uploads/
 
 # IDEs and editors
 /.idea

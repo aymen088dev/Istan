@@ -59,3 +59,27 @@ export async function saveSharedComposition(composition: SavedComposition): Prom
 export function deleteSharedComposition(id: string) {
   return request<void>(`/compositions/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
+
+/**
+ * Envoie le logo (data URL base64) au serveur qui le stocke dans son dossier
+ * data/uploads. La promesse résout avec l'URL publique du fichier stocké.
+ */
+export async function uploadClubLogo(dataUrl: string): Promise<{ url: string; fileName: string }> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 15_000);
+  try {
+    const response = await fetch(`/api/uploads`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: dataUrl }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({})) as { message?: string };
+      throw new Error(payload.message || `Envoi du logo impossible (${response.status})`);
+    }
+    return await response.json() as { url: string; fileName: string };
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}

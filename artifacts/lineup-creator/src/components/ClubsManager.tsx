@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Plus, Trash2, Check, Pencil, X, Upload, Users, Trophy, Sparkles, Shield, Flag, Star, Activity, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { BACKGROUNDS } from "@/lib/backgrounds";
 import { SquadManager } from "@/components/SquadManager";
 import { FormationPicker } from "@/components/FormationPicker";
 import { deleteSharedClub, getSharedClubs, saveSharedClub } from "@/lib/sharedApi";
+import { uploadClubLogo } from "@/lib/sharedApi";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export type RosterPlayer = {
   id: string;
@@ -86,7 +88,7 @@ function emptyForm(): Omit<Club, "id"> {
   };
 }
 
-function ClubBadge({ club, className = "h-14 w-14" }: { club: Club; className?: string }) {
+const ClubBadge = memo(function ClubBadge({ club, className = "h-14 w-14" }: { club: Club; className?: string }) {
   const Icon = club.category === "club" ? Shield : Flag;
   return (
     <div
@@ -96,7 +98,7 @@ function ClubBadge({ club, className = "h-14 w-14" }: { club: Club; className?: 
       }}
     >
       {club.logo ? (
-        <img src={club.logo} alt="" className="h-full w-full object-cover" />
+        <img src={club.logo} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
       ) : (
         <>
           <Icon className="h-7 w-7 text-white/80 drop-shadow-md" strokeWidth={1.7} />
@@ -107,7 +109,7 @@ function ClubBadge({ club, className = "h-14 w-14" }: { club: Club; className?: 
       )}
     </div>
   );
-}
+});
 
 function clubStats(club: Club) {
   const roster = club.roster ?? [];
@@ -153,16 +155,23 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
 
   useEffect(() => {
     let active = true;
-    const sync = async () => {
+    const sync = async (isPolling = false) => {
       try {
         const shared = await getSharedClubs();
         if (!active) return;
         if (shared.length > 0) {
-          setClubs(shared);
-          saveClubs(shared);
+          // Ne sauvegarde/rendu que si le contenu a réellement changé : évite
+          // de faire clignoter la liste et de relancer des re-rendus lourds à
+          // chaque tick de polling multi-utilisateur.
+          setClubs(previous => {
+            if (JSON.stringify(previous) === JSON.stringify(shared)) return previous;
+            saveClubs(shared);
+            return shared;
+          });
           setSyncState("ready");
           return;
         }
+        if (isPolling) return; // Ne pousse les clubs locaux qu'une seule fois.
         const local = loadClubs();
         for (const club of local) {
           await saveSharedClub(club);
@@ -176,20 +185,43 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
     void sync();
     const onFocus = () => { void sync(); };
     window.addEventListener("focus", onFocus);
+    // Multi-utilisateur : tous les navigateurs voient les nouveaux clubs et
+    // logos sans recharger la page.
+    const poll = window.setInterval(() => { void sync(true); }, 5000);
     return () => {
       active = false;
+      window.clearInterval(poll);
       window.removeEventListener("focus", onFocus);
     };
   }, []);
 
   const filtered = clubs.filter(c => filterCat === "all" || c.category === filterCat);
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      setSyncState("offline");
+      e.target.value = "";
+      return;
+    }
     const reader = new FileReader();
-    reader.onload = ev => setForm(f => ({ ...f, logo: ev.target?.result as string }));
+    reader.onerror = () => e.target.value = "";
+    reader.onload = async ev => {
+      const dataUrl = ev.target?.result as string;
+      // Aperçu immédiat, puis un seul envoi au serveur (stockage dans
+      // data/uploads). En cas d'échec le base64 reste affiché localement.
+      setForm(f => ({ ...f, logo: dataUrl }));
+      try {
+        const { url } = await uploadClubLogo(dataUrl);
+        setForm(f => (f.logo === dataUrl ? { ...f, logo: url } : f));
+        setSyncState("ready");
+      } catch {
+        setSyncState("offline");
+      }
+    };
     reader.readAsDataURL(file);
+    e.target.value = "";
   };
 
   const handleSave = () => {
@@ -292,7 +324,9 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
 
       {/* Club grid */}
       <div className="grid max-h-[min(55vh,520px)] grid-cols-2 gap-2.5 overflow-y-auto pr-1 sm:grid-cols-3">
-        {filtered.map(club => (
+        {filtered.map(club => {
+          const stats = clubStats(club);
+          return (
           <div
             key={club.id}
             role="button"
@@ -315,8 +349,8 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
               {club.category === "club" ? "Club" : "Sél."}
             </span>
             <div className="grid w-full grid-cols-2 gap-1 border-t border-border/40 pt-1.5 text-center">
-              <span className="text-[9px] text-muted-foreground"><b className="block text-[11px] text-foreground">{clubStats(club).averageRating || "—"}</b>GEN moyen</span>
-              <span className="text-[9px] text-muted-foreground"><b className="block text-[11px] text-foreground">{clubStats(club).averageAge || "—"}</b>âge moyen</span>
+              <span className="text-[9px] text-muted-foreground"><b className="block text-[11px] text-foreground">{stats.averageRating || "—"}</b>GEN moyen</span>
+              <span className="text-[9px] text-muted-foreground"><b className="block text-[11px] text-foreground">{stats.averageAge || "—"}</b>âge moyen</span>
             </div>
 
             {/* Hover actions */}
@@ -335,7 +369,8 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
               </button>
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {/* Add button */}
         <button onClick={() => { setShowForm(true); setEditId(null); setForm(emptyForm()); }}
@@ -388,8 +423,10 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
               <Label className="text-xs">Logo</Label>
               <Button variant="outline" size="sm" className="h-8 w-full text-xs relative overflow-hidden gap-1.5">
                 <Upload className="w-3 h-3" />
-                {form.logo ? "Changer" : "Logo"}
-                <input ref={logoRef} type="file" accept="image/*" onChange={handleLogoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                {form.logo ? "Remplacer" : "Logo"}                  <Button type="button" variant="ghost" size="icon" onClick={() => setForm(f => ({ ...f, logo: undefined }))} className="h-7 w-7 text-destructive shrink-0" title="Retirer le logo">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <input ref={logoRef} type="file" accept="image/*" onChange={handleLogoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
               </Button>
             </div>
           </div>
@@ -445,55 +482,69 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
         </div>
       )}
 
-      <Dialog open={!!menuClub} onOpenChange={open => { if (!open) setMenuClubId(null); }}>
+      <Sheet open={!!menuClub} onOpenChange={open => { if (!open) setMenuClubId(null); }}>
         {menuClub && (
-          <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-zinc-950 p-0 sm:max-w-[430px]">
-            <div className="relative overflow-hidden rounded-t-lg p-5" style={{ background: `linear-gradient(135deg, ${menuClub.jerseyColor} 0%, ${menuClub.accentColor} 115%)` }}>
-              <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <SheetContent side="bottom" className="flex max-h-[88vh] flex-col rounded-t-3xl border-white/10 bg-zinc-950 p-0">
+            <div className="relative shrink-0 overflow-hidden px-5 pb-4 pt-3" style={{ background: `linear-gradient(140deg, ${menuClub.jerseyColor} 0%, ${menuClub.accentColor} 130%)` }}>
+              <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
+              <div className="absolute -left-6 bottom-0 h-20 w-20 rounded-full bg-black/20 blur-xl" />
+              <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/30" />
               <div className="relative flex items-center gap-4">
-                <ClubBadge club={menuClub} className="h-20 w-20 shrink-0 border-white/30 bg-black/20" />
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/65">{menuClub.category === "club" ? "Club" : "Sélection"}</p>
-                  <h2 className="truncate text-2xl font-black text-white">{menuClub.name}</h2>
-                  <p className="mt-1 text-xs font-semibold text-white/70">{clubStats(menuClub).count} joueur{clubStats(menuClub).count > 1 ? "s" : ""} dans l’effectif</p>
+                <ClubBadge club={menuClub} className="h-16 w-16 shrink-0 border-white/30 bg-black/25 shadow-xl" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-white/65">{menuClub.category === "club" ? "Club" : "Sélection"}</p>
+                  <h2 className="truncate text-xl font-black leading-tight text-white drop-shadow-md">{menuClub.name}</h2>
+                  <p className="mt-0.5 text-[11px] font-semibold text-white/75">
+                    {clubStats(menuClub).count} joueur{clubStats(menuClub).count > 1 ? "s" : ""} · style {JERSEY_STYLE_LABELS[menuClub.jerseyStyle]?.toLowerCase() ?? menuClub.jerseyStyle}
+                  </p>
                 </div>
               </div>
             </div>
-            <DialogHeader>
-              <DialogTitle className="sr-only">{menuClub.name}</DialogTitle>
-              <DialogDescription className="sr-only">Actions et statistiques du club</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 p-5 pt-3">
+            <SheetHeader className="sr-only">
+              <SheetTitle>{menuClub.name}</SheetTitle>
+            </SheetHeader>
+            <div className="flex-1 space-y-4 overflow-y-auto px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { icon: Star, label: "GEN moyen", value: clubStats(menuClub).averageRating || "—" },
-                  { icon: CalendarDays, label: "Âge moyen", value: clubStats(menuClub).averageAge ? `${clubStats(menuClub).averageAge} ans` : "—" },
-                  { icon: Activity, label: "Meilleur GEN", value: clubStats(menuClub).topRating || "—" },
+                  { icon: Star, label: "GEN moyen", value: clubStats(menuClub).averageRating || "—", highlight: true },
+                  { icon: CalendarDays, label: "Âge moyen", value: clubStats(menuClub).averageAge ? `${clubStats(menuClub).averageAge} ans` : "—", highlight: false },
+                  { icon: Activity, label: "Meilleur GEN", value: clubStats(menuClub).topRating || "—", highlight: false },
                 ].map(stat => (
-                  <div key={stat.label} className="rounded-xl border border-border/50 bg-muted/20 p-2.5 text-center">
+                  <div
+                    key={stat.label}
+                    className={`rounded-2xl border p-2.5 text-center ${stat.highlight ? "border-primary/40 bg-primary/10" : "border-border/50 bg-muted/20"}`}
+                  >
                     <stat.icon className="mx-auto mb-1 h-3.5 w-3.5 text-primary" />
                     <p className="text-sm font-black">{stat.value}</p>
-                    <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">{stat.label}</p>
+                    <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">{stat.label}</p>
                   </div>
                 ))}
               </div>
               <div className="grid gap-2">
-                <Button type="button" className="h-11 justify-start gap-3 rounded-xl font-bold" onClick={() => { onApply(menuClub); setMenuClubId(null); }}>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/15"><Check className="h-4 w-4" /></span> Appliquer le thème
-                </Button>
-                <Button type="button" variant="secondary" className="h-11 justify-start gap-3 rounded-xl font-bold" onClick={() => openSquad(menuClub)}>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15"><Users className="h-4 w-4 text-primary" /></span> Ouvrir l’effectif
-                </Button>
-                {onApplyBestXI && (menuClub.roster?.length ?? 0) > 0 && (
-                  <Button type="button" variant="outline" className="h-11 justify-start gap-3 rounded-xl font-bold" onClick={() => openBestXI(menuClub, "local")}>
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Trophy className="h-4 w-4 text-primary" /></span> Placer le meilleur XI
+                <button
+                  type="button"
+                  onClick={() => { onApply(menuClub); setMenuClubId(null); }}
+                  className="flex h-12 items-center gap-3 rounded-2xl px-4 text-left text-sm font-black text-white shadow-lg transition-transform active:scale-[0.98]"
+                  style={{ background: `linear-gradient(135deg, ${menuClub.jerseyColor} 0%, ${menuClub.accentColor} 100%)` }}
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-black/25"><Check className="h-4 w-4" /></span>
+                  <span className="flex-1">Appliquer le thème</span>
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button type="button" variant="secondary" className="h-11 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-bold" onClick={() => openSquad(menuClub)}>
+                    <Users className="h-4 w-4 text-primary" /> Effectif
                   </Button>
-                )}
-                {onApplyBestXIAI && (menuClub.roster?.length ?? 0) > 0 && (
-                  <Button type="button" variant="outline" className="h-11 justify-start gap-3 rounded-xl font-bold" onClick={() => openBestXI(menuClub, "ai")}>
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Sparkles className="h-4 w-4 text-primary" /></span> Optimiser avec l’IA
-                  </Button>
-                )}
+                  {onApplyBestXI && (menuClub.roster?.length ?? 0) > 0 && (
+                    <Button type="button" variant="outline" className="h-11 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-bold" onClick={() => openBestXI(menuClub, "local")}>
+                      <Trophy className="h-4 w-4 text-primary" /> Meilleur XI
+                    </Button>
+                  )}
+                  {onApplyBestXIAI && (menuClub.roster?.length ?? 0) > 0 && (
+                    <Button type="button" variant="outline" className="h-11 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-bold" onClick={() => openBestXI(menuClub, "ai")}>
+                      <Sparkles className="h-4 w-4 text-primary" /> Optimiser IA
+                    </Button>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <Button type="button" variant="ghost" className="justify-center gap-2 rounded-xl text-xs" onClick={() => { handleEdit(menuClub); setMenuClubId(null); }}>
                     <Pencil className="h-3.5 w-3.5" /> Modifier
@@ -504,9 +555,9 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
                 </div>
               </div>
             </div>
-          </DialogContent>
+          </SheetContent>
         )}
-      </Dialog>
+      </Sheet>
 
       <FormationPicker
         open={Boolean(formationClub && bestXIMode)}

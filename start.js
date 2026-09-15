@@ -12,7 +12,7 @@ const configuredPublicPort =
   process.env.PORT ||
   process.env.SERVER_PORT ||
   process.env.PTERODACTYL_PORT ||
-  "0089";
+  "10089";
 const publicPort = Number(configuredPublicPort);
 if (!Number.isInteger(publicPort) || publicPort <= 0 || publicPort > 65535) {
   throw new Error(`Invalid public port: "${configuredPublicPort}"`);

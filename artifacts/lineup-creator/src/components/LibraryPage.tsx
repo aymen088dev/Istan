@@ -48,8 +48,13 @@ export function LibraryPage({ onLoadComposition, currentState }: Props) {
         const shared = await getSharedCompositions();
         if (!active) return;
         if (shared.length > 0) {
-          setCompositions(shared);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(shared));
+          // Ne remplace l'état que si le contenu a changé : évite les re-rendus
+          // complets à chaque tick de synchronisation.
+          setCompositions(previous => {
+            if (JSON.stringify(previous) === JSON.stringify(shared)) return previous;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(shared));
+            return shared;
+          });
           return;
         }
         const local = loadCompositions();
@@ -59,7 +64,7 @@ export function LibraryPage({ onLoadComposition, currentState }: Props) {
       }
     };
     void sync();
-    const timer = window.setInterval(() => { void sync(); }, 10000);
+    const timer = window.setInterval(() => { void sync(); }, 30000);
     return () => {
       active = false;
       window.clearInterval(timer);

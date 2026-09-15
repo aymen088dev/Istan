@@ -200,6 +200,68 @@ function optimizeAssignment(
     }
   }
 
+  // Passes "pas de poste vide" : quand l'effectif compte assez de joueurs de
+  // champ pour couvrir tous les slots non-gardien, chaque poste doit recevoir
+  // quelqu'un de compatible ou, à défaut, le joueur de champ restant le plus
+  // proche (jamais un gardien déplacé). Un joueur déplacé doit toujours
+  // améliorer la compatibilité globale du XI.
+  const fieldSlots = ordered
+    .filter(({ slot }) => profileFormationSlot(slot, sport).role !== "goalkeeper")
+    .map(({ index }) => index);
+  const fieldPlayers = players.filter(player => profilePlayerPosition(player.position, sport).role !== "goalkeeper");
+  const needsRepair = fieldSlots.length <= fieldPlayers.length
+    ? fieldSlots.filter(index => !assignment.has(index))
+    : [];
+  if (needsRepair.length > 0) {
+    const unfilled = new Set(needsRepair);
+    for (const index of needsRepair) {
+      const slot = slots[index];
+      // 1) Un joueur compatible non encore placé ?
+      const compatible = fieldPlayers
+        .filter(player => !used.has(player.id))
+        .sort((a, b) => assignmentValue(slot, b, sport) - assignmentValue(slot, a, sport))[0];
+      if (compatible) {
+        used.add(compatible.id);
+        assignment.set(index, compatible);
+        unfilled.delete(index);
+        continue;
+      }
+      // 2) Sinon : échange contre le pire joueur de champ déjà placé, si cela
+      // améliore la compatibilité totale (score de poste + note).
+      const swap = fieldPlayers
+        .filter(player => ![...assignment.values()].some(assigned => assigned.id === player.id))
+        .sort((a, b) => b.rating - a.rating)[0]
+        ?? [...assignment.entries()]
+          .filter(([candidateIndex]) => fieldSlots.includes(candidateIndex))
+          .sort((a, b) =>
+            (positionScore(slots[a[0]], a[1], sport) + a[1].rating)
+            - (positionScore(slots[b[0]], b[1], sport) + b[1].rating),
+          )[0]?.[1];
+      if (!swap) continue;
+      const currentIndex = [...assignment.entries()].find(([, player]) => player.id === swap.id)?.[0];
+      const gainHere = assignmentValue(slot, swap, sport);
+      const lossThere = currentIndex === undefined
+        ? 0
+        : assignmentValue(slots[currentIndex], swap, sport);
+      if (currentIndex !== undefined && gainHere <= lossThere) continue;
+      if (currentIndex !== undefined) assignment.delete(currentIndex);
+      used.add(swap.id);
+      assignment.set(index, swap);
+      unfilled.delete(index);
+    }
+    // Les slots vidés par l'échange sont re-remplis avec les restants.
+    const leftovers = fieldPlayers.filter(player => !used.has(player.id));
+    for (const index of unfilled) {
+      const slot = slots[index];
+      const choice = leftovers
+        .sort((a, b) => assignmentValue(slot, b, sport) - assignmentValue(slot, a, sport))[0];
+      if (choice) {
+        used.add(choice.id);
+        assignment.set(index, choice);
+      }
+    }
+  }
+
   // Repair the greedy result with swaps. This catches the common case where
   // a versatile player took a slot needed by a specialist.
   for (let pass = 0; pass < 4; pass += 1) {
