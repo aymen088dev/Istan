@@ -129,7 +129,7 @@ const ClubBadge = memo(function ClubBadge({ club, className = "h-14 w-14" }: { c
       style={{ background: `linear-gradient(145deg, ${club.jerseyColor} 0%, ${club.accentColor} 100%)` }}
     >
       {club.logo ? (
-        <img src={club.logo} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+        <img src={club.logo} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain p-1.5" />
       ) : (
         <>
           <Icon className="h-7 w-7 text-white/80 drop-shadow-md" strokeWidth={1.7} />
@@ -317,6 +317,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
   const [matchForm, setMatchForm] = useState({ opponent: "", scored: "0", conceded: "0" });
   const logoRef = useRef<HTMLInputElement>(null);
   const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const rosterWriteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const queueWrite = useCallback((operation: () => Promise<unknown>) => {
     setSyncState("syncing");
@@ -362,6 +363,10 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
       active = false;
       window.clearInterval(poll);
       window.removeEventListener("focus", onFocus);
+      if (rosterWriteTimerRef.current) {
+        clearTimeout(rosterWriteTimerRef.current);
+        rosterWriteTimerRef.current = null;
+      }
     };
   }, []);
 
@@ -473,7 +478,20 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
   const handleRosterChange = (roster: RosterPlayer[]) => {
     if (!squadClub) return;
     const updated = clubs.map(club => club.id === squadClub.id ? { ...club, roster } : club);
-    persistClub(updated.find(club => club.id === squadClub.id)!, updated);
+    const changedClub = updated.find(club => club.id === squadClub.id);
+    if (!changedClub) return;
+
+    // La saisie d'un nom/âge/poste déclenche plusieurs changements successifs.
+    // On met à jour l'interface immédiatement, mais on n'envoie qu'une seule
+    // sauvegarde serveur 450 ms après la dernière frappe.
+    saveClubs(updated);
+    setClubs(updated);
+    setSyncState("syncing");
+    if (rosterWriteTimerRef.current) clearTimeout(rosterWriteTimerRef.current);
+    rosterWriteTimerRef.current = setTimeout(() => {
+      rosterWriteTimerRef.current = null;
+      queueWrite(() => saveSharedClub(changedClub));
+    }, 450);
   };
 
   const handleCancel = () => {

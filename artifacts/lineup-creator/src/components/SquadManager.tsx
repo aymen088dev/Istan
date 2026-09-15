@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   Bot,
   BarChart3,
@@ -115,16 +115,16 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
 
   const formationMap = (sport === "football" ? FOOTBALL_FORMATIONS : HOCKEY_FORMATIONS) as FormationMap;
   const activeFormation = formation && formationMap[formation] ? formation : Object.keys(formationMap)[0];
-  // analyzeAllFormations scores ~65 formations × roster players; running it on
-  // every render (typing in the roster, opening dialogs…) froze the club menu.
-  // Recompute only when the inputs actually change.
+  // L'analyse de toutes les formations est volontairement différée : la liste
+  // et les champs de saisie restent réactifs même avec un gros effectif.
+  const analysisRoster = useDeferredValue(roster);
   const activeAnalysis = useMemo(
-    () => analyzeFormation(activeFormation, formationMap[activeFormation], roster, sport as AnalysisSport),
-    [activeFormation, formationMap, roster, sport],
+    () => analyzeFormation(activeFormation, formationMap[activeFormation], analysisRoster, sport as AnalysisSport),
+    [activeFormation, formationMap, analysisRoster, sport],
   );
   const recommendedFormation = useMemo(
-    () => analyzeAllFormations(formationMap, roster, sport as AnalysisSport)[0],
-    [formationMap, roster, sport],
+    () => analyzeAllFormations(formationMap, analysisRoster, sport as AnalysisSport)[0],
+    [formationMap, analysisRoster, sport],
   );
 
   const downloadAnalysis = () => {

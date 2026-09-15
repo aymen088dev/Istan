@@ -154,7 +154,9 @@ export function positionScore(slot: FormationSlot, player: AnalysisPlayer, sport
     if (wanted.role === "defender" && actual.role === "defender") return wanted.side && actual.side && wanted.side !== actual.side ? 76 : 88;
     if (wanted.role === "center" && ["center", "forward"].includes(actual.role)) return actual.role === "center" ? 94 : 76;
     if ((wanted.role === "wing" || wanted.role === "forward") && ["wing", "center", "forward"].includes(actual.role)) return actual.role === "wing" ? 86 : 74;
-    return 12;
+    // Un poste inconnu ne doit jamais être considéré comme compatible : cela
+    // envoyait les joueurs mal renseignés sur n'importe quel poste libre.
+    return 0;
   }
   if (wanted.role === "central-defender" && ["central-defender", "defender", "fullback"].includes(actual.role)) return actual.role === "fullback" ? 62 : 88;
   if (wanted.role === "fullback" && ["defender", "midfielder", "wing"].includes(actual.role)) return actual.role === "defender" ? 82 : actual.role === "wing" ? 58 : 46;
@@ -164,7 +166,9 @@ export function positionScore(slot: FormationSlot, player: AnalysisPlayer, sport
   if (wanted.role === "wing" && ["midfielder", "forward", "striker", "attacking-mid"].includes(actual.role)) return actual.role === "midfielder" ? 72 : 62;
   if (wanted.role === "forward" && ["attacking-mid", "striker", "wing"].includes(actual.role)) return actual.role === "striker" ? 82 : 68;
   if (wanted.role === "striker" && ["forward", "wing", "attacking-mid"].includes(actual.role)) return actual.role === "forward" ? 82 : 60;
-  return 12;
+  // Les postes inconnus restent libres plutôt que de produire un placement
+  // visuellement plausible mais tactiquement faux.
+  return 0;
 }
 
 function assignmentValue(slot: FormationSlot, player: AnalysisPlayer, sport: AnalysisSport) {
