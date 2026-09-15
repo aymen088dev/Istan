@@ -326,11 +326,17 @@ function optimizeAssignment(
       profilePlayerPosition(player.position, sport).role !== "goalkeeper",
     );
     for (const { slot, index } of emptyFieldSlots) {
-      const wantedLine = roleLine(profileFormationSlot(slot, sport).role);
+      const wanted = profileFormationSlot(slot, sport);
+      const wantedLine = roleLine(wanted.role);
       const choice = remaining
-        .map(player => ({ player, line: roleLine(profilePlayerPosition(player.position, sport).role) }))
+        .map(player => {
+          const actual = profilePlayerPosition(player.position, sport);
+          // distance de ligne, puis pénalité de côté inversé, puis note
+          const sidePenalty = wanted.side && actual.side && wanted.side !== actual.side ? 0.5 : 0;
+          return { player, line: roleLine(actual.role), sidePenalty };
+        })
         .sort((a, b) =>
-          Math.abs(a.line - wantedLine) - Math.abs(b.line - wantedLine) || b.player.rating - a.player.rating)[0];
+          (Math.abs(a.line - wantedLine) + a.sidePenalty) - (Math.abs(b.line - wantedLine) + b.sidePenalty) || b.player.rating - a.player.rating)[0];
       if (!choice) break;
       assignment.set(index, choice.player);
       remaining.splice(remaining.findIndex(player => player.id === choice.player.id), 1);

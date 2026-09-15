@@ -21,7 +21,7 @@ Sur Pterodactyl : téléversez le projet, `node start.js`, c'est tout. Voir [PTE
 ## ✨ 8 features spéciales
 
 ### 1. 🧠 Best XI intelligent (deterministic + IA)
-L'algorithme local optimise **poste naturel, côté gauche/droit, note OVR et gardien** ensemble, puis affine avec des échanges correctifs. L'IA Groq (optionnelle) ne fait que départager les égalités — jamais de placement absurde. **Garanties : chaque poste reçoit un joueur au poste exact ou compatible, un gardien ne quitte jamais le but, un joueur de champ n'y est jamais envoyé, et un poste sans joueur compatible est affiché « Libre »** au lieu d'être occupé par un faux joueur.
+L'algorithme local optimise **poste naturel, côté gauche/droit, note OVR et gardien** ensemble, puis affine avec des échanges correctifs. L'IA Groq (optionnelle) ne fait que départager les égalités — jamais de placement absurde. **Garanties : chaque poste reçoit un joueur au poste exact ou compatible, un gardien ne quitte jamais le but, un joueur de champ n'y est jamais envoyé, les remplaçants disponibles comblent les postes de champ restants sur la ligne la plus proche de leur poste (côté gauche/droite respecté), et un poste sans candidat viable est affiché « Libre »** au lieu d'être occupé par un faux joueur. Les logos sont rendus via `background-size: contain` — jamais recadrés, y compris à l'export PNG.
 
 ### 2. 📊 Analyse poste par poste de toutes les formations
 Pour chaque effectif, l'app note les **~65 systèmes football + 22 systèmes hockey** : compatibilité moyenne, postes naturels exacts, adaptations, gardien prêt, recommandation de meilleure formation et alertes par poste. Export JSON complet en un clic.
@@ -43,6 +43,20 @@ Les logos importés ne polluent plus les données en base64 : ils sont stockés 
 
 ### 8. ✍️ Génération d'effectifs par IA (Groq)
 Collez un texte brut (liste de joueurs, page Wikipédia…) → effectif structuré complet. Ou générez par critères : nombre, âge min/max, OVR min/max, nationalité, postes — avec **répartition en % des nationalités** (ex. 40% BR, 30% FR, le reste prend la nationalité par défaut). Les joueurs générés restent modifiables et s'ajoutent à l'effectif du club.
+
+---
+
+## 🎨 7 thèmes d'apparence (onglet Options → Thème)
+
+Un nouvel onglet **Thème** dans Options permet de choisir parmi 7 ambiances, appliquées instantanément à **tout le site** (header, onglets, cadres, boutons, dialogs, halos) et mémorisées sur l'appareil :
+
+1. **Émeraude Néon** — violet → bleu → vert (thème signature)
+2. **Océan Profond** — bleus marins et cyans glacés
+3. **Soleil Couchant** — orange brûlé et rose crépusculaire
+4. **Pourpre Royal** — violet impérial rehaussé d'or
+5. **Forêt Sombre** — verts profonds et citronnelle
+6. **Minuit Glacé** — ardoise froide et bleu cristal
+7. **Lave Ardente** — rouge braise sur basalte noir
 
 ---
 

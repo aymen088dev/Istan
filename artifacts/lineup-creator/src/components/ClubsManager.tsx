@@ -130,17 +130,17 @@ const ClubBadge = memo(function ClubBadge({ club, className = "h-14 w-14" }: { c
       style={{ background: `linear-gradient(145deg, ${club.jerseyColor} 0%, ${club.accentColor} 100%)` }}
     >
       {club.logo ? (
-        <span className="absolute inset-1 flex min-h-0 min-w-0 items-center justify-center rounded-xl bg-black/10">
-          <img
-            src={club.logo}
-            alt={`Logo ${club.name}`}
-            loading="eager"
-            decoding="async"
-            draggable={false}
-            className="block max-h-full max-w-full object-contain object-center"
-            style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
-          />
-        </span>
+        <span
+          className="absolute inset-1 rounded-xl"
+          aria-label={`Logo ${club.name}`}
+          role="img"
+          style={{
+            backgroundImage: `url("${club.logo}")`,
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
       ) : (
         <>
           <Icon className="h-7 w-7 text-white/80 drop-shadow-md" strokeWidth={1.7} />

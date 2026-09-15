@@ -29,6 +29,15 @@ import { RatingControl } from "@/components/RatingControl";
 import { upsertPlayersInLibrary } from "@/lib/playerLibrary";
 import { chooseBestXI, normalizeAnalysisPlayer } from "@/lib/formationAnalysis";
 import { suggestBestXI } from "@/lib/ai";
+import { THEMES, DEFAULT_THEME, loadTheme, saveTheme, applyTheme, type AppTheme } from "@/lib/themes";
+
+/** Extrait le n-ième hex d'un dégradé CSS (0 = premier, -1 = dernier) pour l'aperçu des thèmes. */
+function mixPreview(gradient: string, index: number) {
+  const matches = [...gradient.matchAll(/#([0-9a-fA-F]{6})/g)];
+  if (matches.length === 0) return "#10b981";
+  const picked = index <= 0 ? matches[0][1] : matches[matches.length - 1][1];
+  return `#${picked}`;
+}
 
 /* ── Constants ── */
 const COLOR_PRESETS = [
@@ -243,6 +252,7 @@ export default function Home() {
   const [scoreAway, setScoreAway] = useState(saved?.scoreAway ?? "0");
   const [exporting, setExporting] = useState(false);
   const [mobilePage, setMobilePage] = useState<"accueil" | "parametres" | "bibliotheque">("accueil");
+  const [appTheme, setAppTheme] = useState<AppTheme>(() => DEFAULT_THEME);
 
   /* Bench panel state (mobile) */
   const [benchPanelOpen, setBenchPanelOpen] = useState(false);
@@ -448,6 +458,15 @@ export default function Home() {
     setMobilePage("accueil");
   };
 
+  // Thème d'apparence : appliqué au site entier au montage et à chaque choix.
+  useEffect(() => {
+    setAppTheme(loadTheme());
+  }, []);
+  useEffect(() => {
+    applyTheme(appTheme);
+    saveTheme(appTheme);
+  }, [appTheme]);
+
   const handleExport = async () => {
     if (!compositionRef.current || exporting) return;
     setExporting(true);
@@ -572,15 +591,17 @@ export default function Home() {
         </div>
 
         {logoImage && (
-          <div className="absolute top-2 right-2 z-10 flex h-11 w-11 min-h-0 min-w-0 items-center justify-center pointer-events-none">
-            <img
-              src={logoImage}
-              alt="Logo"
-              draggable={false}
-              className="block max-h-full max-w-full object-contain object-center drop-shadow-lg"
-              style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
-            />
-          </div>
+          <div
+            className="absolute top-2 right-2 z-10 h-11 w-11 pointer-events-none drop-shadow-lg"
+            role="img"
+            aria-label="Logo"
+            style={{
+              backgroundImage: `url("${logoImage}")`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
         )}
 
         {players.map((p, i) => (
@@ -780,15 +801,57 @@ export default function Home() {
     </Dialog>
   );
 
-  /* Settings content */
   const SettingsContent = (includeClubs: boolean) => (
     <Tabs defaultValue="general" className="w-full">
-      <TabsList className={`grid w-full mb-4 ${includeClubs ? "grid-cols-4" : "grid-cols-3"}`}>
+      <TabsList className={`grid w-full mb-4 ${includeClubs ? "grid-cols-5" : "grid-cols-4"}`}>
         <TabsTrigger value="general" className="text-[11px]">Général</TabsTrigger>
         <TabsTrigger value="kit" className="text-[11px]">Kit</TabsTrigger>
         <TabsTrigger value="terrain" className="text-[11px]">Terrain</TabsTrigger>
+        <TabsTrigger value="theme" className="text-[11px]">Thème</TabsTrigger>
         {includeClubs && <TabsTrigger value="clubs" className="text-[11px]">Clubs</TabsTrigger>}
       </TabsList>
+
+      {/* ── THÈME ── */}
+      <TabsContent value="theme" className="space-y-3">
+        <div className="rounded-xl border border-border/40 bg-muted/10 p-3">
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Le thème s'applique instantanément à <span className="text-foreground font-semibold">tout le site</span> : menus, onglets,
+            cadres, boutons et dégradés. Il est mémorisé sur cet appareil.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {THEMES.map(theme => {
+            const active = appTheme.id === theme.id;
+            return (
+              <button key={theme.id} onClick={() => setAppTheme(theme)}
+                className={`group relative flex flex-col items-start gap-2 rounded-xl border p-3 text-left transition-all active:scale-[0.98] ${
+                  active
+                    ? "border-2 border-white/70 shadow-[0_0_18px_rgba(255,255,255,0.18)]"
+                    : "border-white/10 hover:border-white/35"
+                }`}>
+                <div className="flex w-full items-center gap-2">
+                  <span className="h-8 w-8 shrink-0 rounded-lg border border-white/20"
+                    style={{ background: theme.activeGradient }} />
+                  <div className="min-w-0">
+                    <div className="truncate text-xs font-bold">{theme.name}</div>
+                    <div className="truncate text-[10px] text-muted-foreground">{theme.description}</div>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  {[theme.accentHex, theme.focusHex, mixPreview(theme.activeGradient, 0), mixPreview(theme.activeGradient, 1)].map((hex, i) => (
+                    <span key={i} className="h-2.5 w-2.5 rounded-full border border-white/20" style={{ background: hex }} />
+                  ))}
+                </div>
+                {active && (
+                  <span className="absolute right-2 top-2 rounded-full bg-white text-[9px] font-black uppercase tracking-wide text-black px-1.5 py-0.5">
+                    Actif
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </TabsContent>
 
       {/* ── GÉNÉRAL ── */}
       <TabsContent value="general" className="space-y-5">
@@ -1081,11 +1144,11 @@ export default function Home() {
 
       {/* ── HEADER ── */}
       <header className="shrink-0 border-b border-emerald-500/25 backdrop-blur-xl z-30"
-        style={{ background: "linear-gradient(90deg, #0d0a1a 0%, #0a1020 45%, #081410 100%)", boxShadow: "0 1px 0 rgba(16,185,129,0.15), 0 4px 24px rgba(124,58,237,0.15)" }}>
+        style={{ background: "var(--theme-header)", boxShadow: "0 1px 0 rgba(16,185,129,0.15), 0 4px 24px rgba(124,58,237,0.15)" }}>
         <div className="flex items-center justify-between px-4 h-13 py-2">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg, #7c3aed 0%, #10b981 100%)" }}>
+              style={{ background: "var(--theme-active-gradient)" }}>
               <span className="text-white text-[11px] font-black">IC</span>
             </div>
             <div className="leading-none">
@@ -1113,7 +1176,7 @@ export default function Home() {
 
       {/* ── MOBILE QUICK CONTROLS (fixed strip below header) ── */}
       <div className="md:hidden shrink-0 z-20 px-3 py-2 flex items-center gap-2 border-b border-emerald-500/20"
-        style={{ background: "linear-gradient(90deg, #0d0a1a 0%, #0a1020 50%, #081410 100%)", backdropFilter: "blur(12px)" }}>
+        style={{ background: "var(--theme-header)", backdropFilter: "blur(12px)" }}>
         {[
           { label: "N°", icon: <Hash className="w-3.5 h-3.5" />, action: handleAutoNumber, color: "" },
           { label: "Miroir", icon: <FlipHorizontal2 className="w-3.5 h-3.5" />, action: handleMirror, color: "" },
@@ -1183,7 +1246,7 @@ export default function Home() {
       {/* ══════════════ MOBILE BOTTOM NAV ══════════════ */}
       <nav className="md:hidden shrink-0 z-30"
         style={{
-          background: "linear-gradient(180deg, #0a1020 0%, #0d0a1a 60%, #081410 100%)",
+          background: "var(--theme-header)",
           backdropFilter: "blur(20px)",
           borderTop: "1px solid rgba(16,185,129,0.28)",
           boxShadow: "0 -8px 32px rgba(0,0,0,0.4)",
