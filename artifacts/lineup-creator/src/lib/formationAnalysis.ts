@@ -14,6 +14,19 @@ export type AnalysisPlayer = {
   nationality?: string;
 };
 
+/** Normalise les joueurs provenant du JSON/API avant toute analyse de poste. */
+export function normalizeAnalysisPlayer(value: Partial<AnalysisPlayer>, index: number): AnalysisPlayer {
+  const rating = Number(value.rating);
+  return {
+    id: typeof value.id === "string" && value.id.trim() ? value.id.trim() : `analysis-player-${index}`,
+    name: typeof value.name === "string" && value.name.trim() ? value.name.trim() : `Joueur ${index + 1}`,
+    position: typeof value.position === "string" ? value.position.trim() : "",
+    rating: Number.isFinite(rating) ? Math.max(1, Math.min(99, rating)) : 75,
+    number: typeof value.number === "string" ? value.number : undefined,
+    nationality: typeof value.nationality === "string" ? value.nationality : undefined,
+  };
+}
+
 export type PositionRole =
   | "goalkeeper"
   | "central-defender"
@@ -99,22 +112,22 @@ export function profilePlayerPosition(value: string, sport: AnalysisSport): Posi
     return { role: "unknown" };
   }
 
-  if (includes(position, ["DG", "LB", "LWB", "LEFT BACK", "LEFT WING BACK", "ARRIERE GAUCHE", "LATERAL GAUCHE", "LATÉRAL GAUCHE"])) return { role: "fullback", side: "left" };
-  if (includes(position, ["DD", "RB", "RWB", "RIGHT BACK", "RIGHT WING BACK", "ARRIERE DROIT", "LATERAL DROIT", "LATÉRAL DROIT"])) return { role: "fullback", side: "right" };
+  if (includes(position, ["DG", "LB", "LWB", "LEFT BACK", "LEFT WING BACK", "ARRIERE GAUCHE", "LATERAL GAUCHE", "LATÉRAL GAUCHE"]) || (position.includes("ARRIERE") || position.includes("LATERAL")) && position.includes("GAUCHE")) return { role: "fullback", side: "left" };
+  if (includes(position, ["DD", "RB", "RWB", "RIGHT BACK", "RIGHT WING BACK", "ARRIERE DROIT", "LATERAL DROIT", "LATÉRAL DROIT"]) || (position.includes("ARRIERE") || position.includes("LATERAL")) && position.includes("DROIT")) return { role: "fullback", side: "right" };
   if (includes(position, rules["central-defender"])) return { role: "central-defender" };
   if (includes(position, ["DÉFENSEUR CENTRAL", "CENTRAL DEFENDER", "STOPPEUR"])) return { role: "central-defender" };
   if (includes(position, rules.defender)) return { role: "defender" };
-  if (includes(position, rules["defensive-mid"])) return { role: "defensive-mid" };
-  if (includes(position, ["MOG", "LEFT ATTACKING MIDFIELDER", "MILIEU OFFENSIF GAUCHE"])) return { role: "attacking-mid", side: "left" };
-  if (includes(position, ["MOD", "RIGHT ATTACKING MIDFIELDER", "MILIEU OFFENSIF DROIT"])) return { role: "attacking-mid", side: "right" };
+  if (includes(position, rules["defensive-mid"]) || position.includes("MILIEU DEFENSIF")) return { role: "defensive-mid" };
+  if (includes(position, ["MOG", "LEFT ATTACKING MIDFIELDER", "MILIEU OFFENSIF GAUCHE"]) || position.includes("MILIEU OFFENSIF GAUCHE")) return { role: "attacking-mid", side: "left" };
+  if (includes(position, ["MOD", "RIGHT ATTACKING MIDFIELDER", "MILIEU OFFENSIF DROIT"]) || position.includes("MILIEU OFFENSIF DROIT")) return { role: "attacking-mid", side: "right" };
   if (includes(position, ["MG", "LM", "LEFT MIDFIELDER", "LEFT MID", "MILIEU GAUCHE"])) return { role: "midfielder", side: "left" };
   if (includes(position, ["MD", "RM", "RIGHT MIDFIELDER", "RIGHT MID", "MILIEU DROIT"])) return { role: "midfielder", side: "right" };
   if (includes(position, rules["attacking-mid"])) return { role: "attacking-mid" };
-  if (includes(position, rules.midfielder)) return { role: "midfielder" };
-  if (includes(position, ["AG", "LW", "LEFT WINGER", "LEFT WING", "AILIER GAUCHE", "AILE GAUCHE"])) return { role: "wing", side: "left" };
-  if (includes(position, ["AD", "RW", "RIGHT WINGER", "RIGHT WING", "AILIER DROIT", "AILE DROITE"])) return { role: "wing", side: "right" };
+  if (includes(position, rules.midfielder) || position.includes("MILIEU RELAYEUR") || position === "MILIEU CENTRAL") return { role: "midfielder" };
+  if (includes(position, ["AG", "LW", "LEFT WINGER", "LEFT WING", "AILIER GAUCHE", "AILE GAUCHE"]) || position.includes("AILIER GAUCHE") || position.includes("AILE GAUCHE")) return { role: "wing", side: "left" };
+  if (includes(position, ["AD", "RW", "RIGHT WINGER", "RIGHT WING", "AILIER DROIT", "AILE DROITE"]) || position.includes("AILIER DROIT") || position.includes("AILE DROITE")) return { role: "wing", side: "right" };
   if (includes(position, rules.striker)) return { role: "striker" };
-  if (includes(position, ["AVANT CENTRE", "AVANT-CENTRE", "CENTRE AVANT"])) return { role: "striker" };
+  if (includes(position, ["AVANT CENTRE", "AVANT-CENTRE", "CENTRE AVANT"]) || position.includes("AVANT CENTRE")) return { role: "striker" };
   if (includes(position, rules.forward)) return { role: "forward" };
   return { role: "unknown" };
 }

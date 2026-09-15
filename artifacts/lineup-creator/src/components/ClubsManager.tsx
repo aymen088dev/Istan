@@ -22,6 +22,7 @@ import {
   type FormationMap,
   type AnalysisSport,
   type AnalysisPlayer,
+  normalizeAnalysisPlayer,
 } from "@/lib/formationAnalysis";
 import { FOOTBALL_FORMATIONS, HOCKEY_FORMATIONS } from "@/lib/formations";
 
@@ -129,7 +130,7 @@ const ClubBadge = memo(function ClubBadge({ club, className = "h-14 w-14" }: { c
       style={{ background: `linear-gradient(145deg, ${club.jerseyColor} 0%, ${club.accentColor} 100%)` }}
     >
       {club.logo ? (
-        <img src={club.logo} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain p-1.5" />
+        <img src={club.logo} alt="" loading="lazy" decoding="async" className="block h-full w-full max-h-full max-w-full object-contain p-1.5" />
       ) : (
         <>
           <Icon className="h-7 w-7 text-white/80 drop-shadow-md" strokeWidth={1.7} />
@@ -174,16 +175,17 @@ const MiniXI = memo(function MiniXI({ club, sport }: { club: Club; sport: Analys
   const best = useMemo(() => {
     if (roster.length === 0) return null;
     const formations = (sport === "football" ? FOOTBALL_FORMATIONS : HOCKEY_FORMATIONS) as FormationMap;
+    const normalizedRoster = roster.map((player, index) => normalizeAnalysisPlayer(player, index));
     let bestName = Object.keys(formations)[0];
     let bestFit = -1;
     for (const [name, definition] of Object.entries(formations)) {
-      const analysis = analyzeFormation(name, definition, roster as AnalysisPlayer[], sport);
+      const analysis = analyzeFormation(name, definition, normalizedRoster, sport);
       if (analysis.averageFit > bestFit) {
         bestFit = analysis.averageFit;
         bestName = name;
       }
     }
-    return analyzeFormation(bestName, formations[bestName], roster as AnalysisPlayer[], sport);
+    return analyzeFormation(bestName, formations[bestName], normalizedRoster, sport);
   }, [roster, sport]);
 
   if (!best) {

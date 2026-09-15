@@ -27,7 +27,7 @@ import { FormationPicker } from "@/components/FormationPicker";
 import { ArrowsOverlay, type Arrow } from "@/components/ArrowsOverlay";
 import { RatingControl } from "@/components/RatingControl";
 import { upsertPlayersInLibrary } from "@/lib/playerLibrary";
-import { chooseBestXI } from "@/lib/formationAnalysis";
+import { chooseBestXI, normalizeAnalysisPlayer } from "@/lib/formationAnalysis";
 import { suggestBestXI } from "@/lib/ai";
 
 /* ── Constants ── */
@@ -361,10 +361,11 @@ export default function Home() {
     setFormation(selectedFormationName);
     const usedIds = new Set<string>();
     const available = roster.map((player, index) => {
-      const baseId = player.id?.trim() || `roster-${index}`;
+      const normalized = normalizeAnalysisPlayer(player, index);
+      const baseId = normalized.id || `roster-${index}`;
       const id = usedIds.has(baseId) ? `${baseId}-${index}` : baseId;
       usedIds.add(id);
-      return { ...player, id };
+      return { ...normalized, id };
     }).sort((a, b) => b.rating - a.rating);
     const chosen = chooseBestXI(selectedFormationName, selectedFormation, available, sport, aiPriority);
     const used = new Set(chosen.flatMap(({ player }) => player ? [player.id] : []));
@@ -393,7 +394,7 @@ export default function Home() {
       .map((player, index) => ({
         id: `bench-${player.id}`,
         name: player.name,
-        number: player.number,
+        number: player.number ?? String(index + 1),
         position: player.position,
         nationality: resolveCountryCode(player.nationality),
         rating: player.rating,
@@ -416,14 +417,17 @@ export default function Home() {
     // The deterministic algorithm remains the baseline and is applied immediately.
     applyBestXI(club, requestedFormation);
     const suggestion = await suggestBestXI(
-      roster.map(player => ({
-        id: player.id,
-        name: player.name,
-        age: player.age,
-        rating: player.rating,
-        position: player.position,
-        number: player.number,
-      })),
+      roster.map((player, index) => {
+        const normalized = normalizeAnalysisPlayer(player, index);
+        return {
+          id: normalized.id,
+          name: normalized.name,
+          age: player.age,
+          rating: normalized.rating,
+          position: normalized.position,
+          number: normalized.number ?? player.number,
+        };
+      }),
       sport,
       requestedFormation,
     );
