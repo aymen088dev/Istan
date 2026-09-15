@@ -572,8 +572,14 @@ export default function Home() {
         </div>
 
         {logoImage && (
-          <div className="absolute top-2 right-2 z-10 pointer-events-none">
-            <img src={logoImage} alt="Logo" className="w-11 h-11 object-contain drop-shadow-lg" />
+          <div className="absolute top-2 right-2 z-10 flex h-11 w-11 min-h-0 min-w-0 items-center justify-center pointer-events-none">
+            <img
+              src={logoImage}
+              alt="Logo"
+              draggable={false}
+              className="block max-h-full max-w-full object-contain object-center drop-shadow-lg"
+              style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
+            />
           </div>
         )}
 

@@ -130,7 +130,17 @@ const ClubBadge = memo(function ClubBadge({ club, className = "h-14 w-14" }: { c
       style={{ background: `linear-gradient(145deg, ${club.jerseyColor} 0%, ${club.accentColor} 100%)` }}
     >
       {club.logo ? (
-        <img src={club.logo} alt="" loading="lazy" decoding="async" className="block h-full w-full max-h-full max-w-full object-contain p-1.5" />
+        <span className="absolute inset-1 flex min-h-0 min-w-0 items-center justify-center rounded-xl bg-black/10">
+          <img
+            src={club.logo}
+            alt={`Logo ${club.name}`}
+            loading="eager"
+            decoding="async"
+            draggable={false}
+            className="block max-h-full max-w-full object-contain object-center"
+            style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
+          />
+        </span>
       ) : (
         <>
           <Icon className="h-7 w-7 text-white/80 drop-shadow-md" strokeWidth={1.7} />
@@ -546,7 +556,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
   return (
     <div className="space-y-4">
       {/* ── En-tête ── */}
-      <div className="flex items-end justify-between gap-3 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/15 via-background to-background p-4">
+      <div className="flex items-end justify-between gap-3 rounded-2xl border border-emerald-400/35 bg-gradient-to-br from-violet-950/80 via-blue-950/70 to-emerald-950/80 p-4 shadow-[0_0_28px_rgba(16,185,129,0.12)]">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Espace équipe</p>
           <h3 className="mt-1 text-lg font-black tracking-tight">Clubs & effectifs</h3>
@@ -555,7 +565,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
             {syncState === "syncing" ? "Synchronisation…" : syncState === "offline" ? "Mode local · serveur partagé indisponible" : "Données synchronisées"}
           </p>
         </div>
-        <div className="shrink-0 rounded-xl border border-border/50 bg-background/60 px-3 py-2 text-center">
+        <div className="shrink-0 rounded-xl border border-emerald-400/35 bg-emerald-950/35 px-3 py-2 text-center">
           <p className="text-lg font-black text-primary">{clubs.length}</p>
           <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">équipes</p>
         </div>
@@ -607,7 +617,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
               role="button"
               tabIndex={0}
               aria-label={`Ouvrir le menu de ${club.name}`}
-              className="group relative cursor-pointer rounded-2xl border border-border/50 bg-gradient-to-b from-muted/35 to-muted/10 p-3 transition-all hover:-translate-y-0.5 hover:border-primary/50"
+              className="group relative cursor-pointer rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-violet-950/45 via-blue-950/35 to-emerald-950/45 p-3 transition-all hover:-translate-y-0.5 hover:border-emerald-300/75 hover:shadow-[0_0_22px_rgba(16,185,129,0.16)]"
               onClick={() => { setMenuClubId(club.id); setMenuTab("apercu"); }}
               onKeyDown={event => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -652,7 +662,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
         })}
 
         <button onClick={() => { setShowForm(true); setEditId(null); setForm(emptyForm()); }}
-          className="flex h-full min-h-[88px] flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border/40 bg-muted/10 p-2 transition-all hover:border-primary/50">
+          className="flex h-full min-h-[88px] flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-emerald-400/35 bg-gradient-to-br from-violet-950/30 via-blue-950/25 to-emerald-950/30 p-2 transition-all hover:border-emerald-300/80">
           <Plus className="h-5 w-5 text-muted-foreground" />
           <span className="text-[9px] font-semibold text-muted-foreground">Ajouter</span>
         </button>
@@ -660,7 +670,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
 
       {/* ── Formulaire d'ajout / édition ── */}
       {showForm && (
-        <div className="space-y-3 rounded-xl border border-primary/30 bg-muted/20 p-4">
+        <div className="space-y-3 rounded-xl border border-emerald-400/45 bg-gradient-to-br from-violet-950/50 via-blue-950/40 to-emerald-950/50 p-4 shadow-[0_0_24px_rgba(16,185,129,0.1)]">
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold">{editId ? "Modifier le club" : "Nouveau club"}</span>
             <button onClick={handleCancel} className="flex h-6 w-6 items-center justify-center rounded-full bg-muted/50 text-muted-foreground hover:text-foreground">
@@ -755,7 +765,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
       {/* ═══════════════ MENU CLUB — BOTTOM-SHEET 3 ONGLETS ═══════════════ */}
       <Sheet open={!!menuClub} onOpenChange={open => { if (!open) setMenuClubId(null); }}>
         {menuClub && (
-          <SheetContent side="bottom" className="flex max-h-[90vh] flex-col rounded-t-3xl border-white/10 bg-zinc-950 p-0">
+          <SheetContent side="bottom" className="flex max-h-[90vh] flex-col rounded-t-3xl border-2 border-emerald-400/45 bg-gradient-to-b from-violet-950 via-blue-950/95 to-emerald-950 p-0 shadow-[0_-8px_40px_rgba(16,185,129,0.2)]">
             <SheetHeader className="sr-only">
               <SheetTitle>{menuClub.name}</SheetTitle>
             </SheetHeader>
@@ -786,7 +796,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
             </div>
 
             {/* Onglets du menu */}
-            <div className="flex shrink-0 gap-1 border-b border-white/10 px-4 pb-2 pt-1">
+            <div className="flex shrink-0 gap-1 border-b border-emerald-400/30 px-4 pb-2 pt-1">
               {([
                 { id: "apercu" as const, label: "Aperçu", icon: LayoutGrid },
                 { id: "match" as const, label: "Matchs", icon: Swords },
@@ -795,7 +805,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
                 <button
                   key={tab.id}
                   onClick={() => setMenuTab(tab.id)}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-[11px] font-bold transition-colors ${menuTab === tab.id ? "bg-primary/15 text-primary" : "text-white/45 hover:text-white/80"}`}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-[11px] font-bold transition-colors ${menuTab === tab.id ? "bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/50" : "text-white/55 hover:bg-blue-400/10 hover:text-white/90"}`}
                 >
                   <tab.icon className="h-3.5 w-3.5" />
                   {tab.label}
@@ -804,7 +814,7 @@ export function ClubsManager({ onApply, onApplyBestXI, onApplyBestXIAI, onRecomm
             </div>
 
             {/* Contenu de l'onglet actif */}
-            <div className="flex-1 space-y-4 overflow-y-auto px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
+            <div className="flex-1 space-y-4 overflow-y-auto border-t border-emerald-400/10 bg-gradient-to-b from-violet-950/20 via-blue-950/15 to-emerald-950/25 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
               {menuTab === "apercu" && (
                 <>
                   {/* Statistiques rapides */}

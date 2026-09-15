@@ -67,6 +67,17 @@ export type FormationAnalysis = {
   warnings: string[];
 };
 
+export type RosterDiagnosis = {
+  total: number;
+  goalkeepers: number;
+  defenders: number;
+  midfielders: number;
+  attackers: number;
+  unknownPositions: string[];
+  duplicateNumbers: string[];
+  warnings: string[];
+};
+
 const RULES = {
   football: footballRules,
   hockey: hockeyRules,
@@ -116,7 +127,8 @@ export function profilePlayerPosition(value: string, sport: AnalysisSport): Posi
   if (includes(position, ["DD", "RB", "RWB", "RIGHT BACK", "RIGHT WING BACK", "ARRIERE DROIT", "LATERAL DROIT", "LATÉRAL DROIT"]) || (position.includes("ARRIERE") || position.includes("LATERAL")) && position.includes("DROIT")) return { role: "fullback", side: "right" };
   if (includes(position, rules["central-defender"])) return { role: "central-defender" };
   if (includes(position, ["DÉFENSEUR CENTRAL", "CENTRAL DEFENDER", "STOPPEUR"])) return { role: "central-defender" };
-  if (includes(position, rules.defender)) return { role: "defender" };
+  if (includes(position, rules.defender) || position.includes("DEFENSEUR") || position.includes("DEFENSEURE")) return { role: "defender" };
+  if ((position.includes("ARRIERE") || position.includes("LATERAL")) && !position.includes("GAUCHE") && !position.includes("DROIT")) return { role: "fullback" };
   if (includes(position, rules["defensive-mid"]) || position.includes("MILIEU DEFENSIF")) return { role: "defensive-mid" };
   if (includes(position, ["MOG", "LEFT ATTACKING MIDFIELDER", "MILIEU OFFENSIF GAUCHE"]) || position.includes("MILIEU OFFENSIF GAUCHE")) return { role: "attacking-mid", side: "left" };
   if (includes(position, ["MOD", "RIGHT ATTACKING MIDFIELDER", "MILIEU OFFENSIF DROIT"]) || position.includes("MILIEU OFFENSIF DROIT")) return { role: "attacking-mid", side: "right" };
@@ -124,8 +136,9 @@ export function profilePlayerPosition(value: string, sport: AnalysisSport): Posi
   if (includes(position, ["MD", "RM", "RIGHT MIDFIELDER", "RIGHT MID", "MILIEU DROIT"])) return { role: "midfielder", side: "right" };
   if (includes(position, rules["attacking-mid"])) return { role: "attacking-mid" };
   if (includes(position, rules.midfielder) || position.includes("MILIEU RELAYEUR") || position === "MILIEU CENTRAL") return { role: "midfielder" };
-  if (includes(position, ["AG", "LW", "LEFT WINGER", "LEFT WING", "AILIER GAUCHE", "AILE GAUCHE"]) || position.includes("AILIER GAUCHE") || position.includes("AILE GAUCHE")) return { role: "wing", side: "left" };
-  if (includes(position, ["AD", "RW", "RIGHT WINGER", "RIGHT WING", "AILIER DROIT", "AILE DROITE"]) || position.includes("AILIER DROIT") || position.includes("AILE DROITE")) return { role: "wing", side: "right" };
+  if (includes(position, ["AG", "LW", "LEFT WINGER", "LEFT WING", "AILIER GAUCHE", "AILE GAUCHE"]) || position.includes("AILIER GAUCHE") || position.includes("AILIERE GAUCHE") || position.includes("AILE GAUCHE")) return { role: "wing", side: "left" };
+  if (includes(position, ["AD", "RW", "RIGHT WINGER", "RIGHT WING", "AILIER DROIT", "AILE DROITE"]) || position.includes("AILIER DROIT") || position.includes("AILIERE DROITE") || position.includes("AILE DROITE")) return { role: "wing", side: "right" };
+  if (position === "AILIER" || position === "AILIERE") return { role: "wing" };
   if (includes(position, rules.striker)) return { role: "striker" };
   if (includes(position, ["AVANT CENTRE", "AVANT-CENTRE", "CENTRE AVANT"]) || position.includes("AVANT CENTRE")) return { role: "striker" };
   if (includes(position, rules.forward)) return { role: "forward" };
@@ -357,6 +370,39 @@ export function analyzeFormation(
   if (missingPostes > 0) warnings.push(`${missingPostes} poste${missingPostes > 1 ? "s" : ""} sans joueur compatible.`);
   if (adaptations > 0) warnings.push(`${adaptations} adaptation${adaptations > 1 ? "s" : ""} de poste à surveiller.`);
   return { formation, sport, playerCount: players.length, averageFit, exactPostes, adaptations, missingPostes, goalkeeperReady, slots, warnings };
+}
+
+export function diagnoseRoster(players: Array<Partial<AnalysisPlayer>>, sport: AnalysisSport): RosterDiagnosis {
+  const normalized = players.map((player, index) => normalizeAnalysisPlayer(player, index));
+  const counts = { goalkeepers: 0, defenders: 0, midfielders: 0, attackers: 0 };
+  const unknown = new Set<string>();
+  const numbers = new Map<string, number>();
+
+  for (const player of normalized) {
+    const profile = profilePlayerPosition(player.position, sport);
+    if (profile.role === "goalkeeper") counts.goalkeepers += 1;
+    else if (["central-defender", "fullback", "defender"].includes(profile.role)) counts.defenders += 1;
+    else if (["defensive-mid", "midfielder", "attacking-mid"].includes(profile.role)) counts.midfielders += 1;
+    else if (["wing", "center", "forward", "striker"].includes(profile.role)) counts.attackers += 1;
+    else if (player.position.trim()) unknown.add(player.position.trim());
+    const number = player.number?.trim();
+    if (number) numbers.set(number, (numbers.get(number) ?? 0) + 1);
+  }
+
+  const duplicateNumbers = [...numbers.entries()].filter(([, count]) => count > 1).map(([number]) => number);
+  const warnings: string[] = [];
+  if (sport === "football" && counts.goalkeepers === 0) warnings.push("Aucun gardien");
+  if (unknown.size > 0) warnings.push(`${unknown.size} poste${unknown.size > 1 ? "s" : ""} non reconnu${unknown.size > 1 ? "s" : ""}`);
+  if (duplicateNumbers.length > 0) warnings.push(`${duplicateNumbers.length} numéro${duplicateNumbers.length > 1 ? "s" : ""} en doublon`);
+  if (counts.defenders === 0) warnings.push("Aucun défenseur");
+  if (counts.midfielders === 0 && sport === "football") warnings.push("Aucun milieu");
+  return {
+    total: normalized.length,
+    ...counts,
+    unknownPositions: [...unknown],
+    duplicateNumbers,
+    warnings,
+  };
 }
 
 export function analyzeAllFormations(formations: FormationMap, players: AnalysisPlayer[], sport: AnalysisSport) {

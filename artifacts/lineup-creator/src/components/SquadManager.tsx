@@ -25,6 +25,7 @@ import {
   analysisFilePayload,
   analyzeAllFormations,
   analyzeFormation,
+  diagnoseRoster,
   type FormationMap,
   type AnalysisSport,
 } from "@/lib/formationAnalysis";
@@ -125,6 +126,10 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
   const recommendedFormation = useMemo(
     () => analyzeAllFormations(formationMap, analysisRoster, sport as AnalysisSport)[0],
     [formationMap, analysisRoster, sport],
+  );
+  const rosterDiagnosis = useMemo(
+    () => diagnoseRoster(roster, sport as AnalysisSport),
+    [roster, sport],
   );
 
   const downloadAnalysis = () => {
@@ -239,7 +244,7 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
   };
 
   return (
-    <div className="space-y-4 rounded-2xl border border-primary/25 bg-primary/5 p-4">
+    <div className="space-y-4 rounded-2xl border-2 border-emerald-400/40 bg-gradient-to-br from-violet-950/55 via-blue-950/45 to-emerald-950/55 p-4 shadow-[0_0_28px_rgba(16,185,129,0.12)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -268,7 +273,32 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
       {aiBestXIError && <p className="text-xs font-medium text-amber-400">{aiBestXIError}</p>}
 
       {roster.length > 0 && (
-        <div className="overflow-hidden rounded-xl border border-primary/20 bg-background/45">
+        <div className="rounded-xl border border-emerald-400/30 bg-gradient-to-r from-violet-950/45 via-blue-950/35 to-emerald-950/45 px-3 py-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2 text-xs font-black">
+              <Lightbulb className="h-4 w-4 text-amber-400" /> Contrôle de l’effectif
+            </span>
+            <span className="text-[10px] font-bold text-muted-foreground">{rosterDiagnosis.total} joueurs</span>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-bold">
+            <span className="rounded-full bg-blue-500/15 px-2 py-1 text-blue-300">GB {rosterDiagnosis.goalkeepers}</span>
+            <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300">DEF {rosterDiagnosis.defenders}</span>
+            <span className="rounded-full bg-violet-500/15 px-2 py-1 text-violet-300">MIL {rosterDiagnosis.midfielders}</span>
+            <span className="rounded-full bg-orange-500/15 px-2 py-1 text-orange-300">ATT {rosterDiagnosis.attackers}</span>
+          </div>
+          {rosterDiagnosis.warnings.length > 0 ? (
+            <p className="mt-2 text-[10px] font-semibold text-amber-300">À vérifier : {rosterDiagnosis.warnings.join(" · ")}</p>
+          ) : (
+            <p className="mt-2 text-[10px] font-semibold text-emerald-300">Effectif correctement renseigné.</p>
+          )}
+          {rosterDiagnosis.unknownPositions.length > 0 && (
+            <p className="mt-1 truncate text-[10px] text-muted-foreground">Postes non reconnus : {rosterDiagnosis.unknownPositions.join(", ")}</p>
+          )}
+        </div>
+      )}
+
+      {roster.length > 0 && (
+        <div className="overflow-hidden rounded-xl border border-emerald-400/30 bg-gradient-to-br from-violet-950/35 via-blue-950/25 to-emerald-950/35">
           <button
             type="button"
             onClick={() => setAnalysisOpen(open => !open)}
@@ -365,7 +395,7 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
         )}
       </div>
 
-      <div className="space-y-3 border-t border-primary/15 pt-3">
+      <div className="space-y-3 border-t border-emerald-400/25 pt-3">
         <div className="flex items-center gap-2">
           <Bot className="h-4 w-4 text-primary" />
           <p className="text-xs font-black uppercase tracking-wider text-primary">Générateur IA Groq</p>
