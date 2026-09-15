@@ -3,7 +3,7 @@
   "version": 1,
   "description": "Référentiel des postes utilisé par l'analyseur de formations football.",
   "roles": {
-    "goalkeeper": ["GB", "G", "GK", "GARDIEN", "GOALKEEPER"],
+    "goalkeeper": ["GB", "G", "GK", "GARDIEN", "GARDIENNE", "GOALKEEPER"],
     "central-defender": ["DC", "DFC", "CB", "LIBERO", "STOPPEUR", "DEFENSEUR CENTRAL"],
     "fullback": ["DG", "DD", "LB", "RB", "LWB", "RWB", "LAT", "PGA", "Piston"],
     "defender": ["D", "DEF", "DEFENSEUR", "DEFENSE"],
@@ -12,7 +12,7 @@
     "attacking-mid": ["MOC", "CAM", "AM", "MOG", "MOD", "MILIEU OFFENSIF"],
     "wing": ["AG", "AD", "LW", "RW", "AILIER GAUCHE", "AILIER DROIT"],
     "forward": ["SS", "SECOND STRIKER", "SUPPORT STRIKER"],
-    "striker": ["BU", "ST", "CF", "AC", "BT", "F", "ATT", "AVANT CENTRE", "FORWARD", "ATTACKER"]
+    "striker": ["BU", "ST", "CF", "AC", "BT", "F", "ATT", "ATTAQUANT", "ATTAQUANTE", "AVANT CENTRE", "FORWARD", "ATTACKER"]
   },
   "slotRules": {
     "AG_AD": "Un AG/AD situé derrière la ligne médiane est un latéral; au-dessus, c'est un ailier.",

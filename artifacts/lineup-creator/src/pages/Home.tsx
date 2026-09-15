@@ -1080,8 +1080,8 @@ export default function Home() {
     <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
 
       {/* ── HEADER ── */}
-      <header className="shrink-0 border-b border-white/[0.06] bg-background/95 backdrop-blur-xl z-30"
-        style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.04)" }}>
+      <header className="shrink-0 border-b border-emerald-500/25 backdrop-blur-xl z-30"
+        style={{ background: "linear-gradient(90deg, #0d0a1a 0%, #0a1020 45%, #081410 100%)", boxShadow: "0 1px 0 rgba(16,185,129,0.15), 0 4px 24px rgba(124,58,237,0.15)" }}>
         <div className="flex items-center justify-between px-4 h-13 py-2">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
@@ -1112,8 +1112,8 @@ export default function Home() {
       </header>
 
       {/* ── MOBILE QUICK CONTROLS (fixed strip below header) ── */}
-      <div className="md:hidden shrink-0 z-20 px-3 py-2 flex items-center gap-2 border-b border-white/[0.04]"
-        style={{ background: "rgba(10,12,18,0.92)", backdropFilter: "blur(12px)" }}>
+      <div className="md:hidden shrink-0 z-20 px-3 py-2 flex items-center gap-2 border-b border-emerald-500/20"
+        style={{ background: "linear-gradient(90deg, #0d0a1a 0%, #0a1020 50%, #081410 100%)", backdropFilter: "blur(12px)" }}>
         {[
           { label: "N°", icon: <Hash className="w-3.5 h-3.5" />, action: handleAutoNumber, color: "" },
           { label: "Miroir", icon: <FlipHorizontal2 className="w-3.5 h-3.5" />, action: handleMirror, color: "" },
@@ -1183,9 +1183,9 @@ export default function Home() {
       {/* ══════════════ MOBILE BOTTOM NAV ══════════════ */}
       <nav className="md:hidden shrink-0 z-30"
         style={{
-          background: "rgba(10,12,18,0.96)",
+          background: "linear-gradient(180deg, #0a1020 0%, #0d0a1a 60%, #081410 100%)",
           backdropFilter: "blur(20px)",
-          borderTop: "1px solid rgba(255,255,255,0.05)",
+          borderTop: "1px solid rgba(16,185,129,0.28)",
           boxShadow: "0 -8px 32px rgba(0,0,0,0.4)",
           paddingBottom: "env(safe-area-inset-bottom)",
         }}>

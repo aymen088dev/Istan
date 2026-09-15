@@ -72,8 +72,8 @@
   --popover: 220 20% 10%;
   --popover-foreground: 0 0% 100%;
   --popover-border: 220 20% 15%;
-  --primary: 142 70% 50%;
-  --primary-foreground: 0 0% 0%;
+  --primary: 262 84% 62%;
+  --primary-foreground: 0 0% 100%;
   --secondary: 220 20% 15%;
   --secondary-foreground: 0 0% 100%;
   --muted: 220 20% 15%;
@@ -98,10 +98,46 @@
   #root { height: 100%; }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   THÈME GLOBAL violet → bleu → vert (appliqué à tout le site)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Onglets shadcn (Tous les TabsTrigger du site) */
+[role="tablist"] {
+  background: rgba(124, 58, 237, 0.08) !important;
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+[role="tab"][data-state="active"] {
+  background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 55%, #10b981 130%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.45);
+}
+
+/* Dialogs (fenêtres modales du site) */
+[role="dialog"] {
+  background: linear-gradient(160deg, #0d0a1a 0%, #0a1020 45%, #081410 100%) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  box-shadow: 0 0 60px rgba(124, 58, 237, 0.18), 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Menus déroulants / popovers */
+[role="menu"], [role="listbox"] {
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* Focus ring vert partout (cohérence clavier/mobile) */
+*:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.65);
+  outline-offset: 1px;
+}
+
+/* Barre de défilement teintée thème */
+::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.45); }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.25); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
 
 /* Smooth transitions for sidebar */

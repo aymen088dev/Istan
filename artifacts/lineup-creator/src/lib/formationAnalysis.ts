@@ -111,7 +111,7 @@ export function profilePlayerPosition(value: string, sport: AnalysisSport): Posi
   const key = compact(value);
   const rules = RULES[sport].roles as Record<string, readonly string[]>;
 
-  if (includes(position, [...rules.goalkeeper, "GARDIEN DE BUT", "KEEPER"])) return { role: "goalkeeper" };
+  if (includes(position, [...rules.goalkeeper, "GARDIEN DE BUT", "GARDIENNE", "KEEPER"])) return { role: "goalkeeper" };
   if (sport === "hockey") {
     if (includes(position, ["DG", "LD", "LEFT DEFENSE", "LEFT DEFENCEMAN", "DÉFENSEUR GAUCHE"])) return { role: "defender", side: "left" };
     if (includes(position, ["DD", "RD", "RIGHT DEFENSE", "RIGHT DEFENCEMAN", "DÉFENSEUR DROIT"])) return { role: "defender", side: "right" };
@@ -139,6 +139,11 @@ export function profilePlayerPosition(value: string, sport: AnalysisSport): Posi
   if (includes(position, ["AG", "LW", "LEFT WINGER", "LEFT WING", "AILIER GAUCHE", "AILE GAUCHE"]) || position.includes("AILIER GAUCHE") || position.includes("AILIERE GAUCHE") || position.includes("AILE GAUCHE")) return { role: "wing", side: "left" };
   if (includes(position, ["AD", "RW", "RIGHT WINGER", "RIGHT WING", "AILIER DROIT", "AILE DROITE"]) || position.includes("AILIER DROIT") || position.includes("AILIERE DROITE") || position.includes("AILE DROITE")) return { role: "wing", side: "right" };
   if (position === "AILIER" || position === "AILIERE") return { role: "wing" };
+  // Libellés génériques français produits par la génération IA : sans eux,
+  // ces joueurs sont inconnus et leurs postes finissent « Libre ».
+  if (position.includes("ATTAQUANT")) return { role: "striker" };
+  if (position.includes("DEFENSE")) return { role: "defender" };
+  if (position.includes("MILIEU")) return { role: "midfielder" };
   if (includes(position, rules.striker)) return { role: "striker" };
   if (includes(position, ["AVANT CENTRE", "AVANT-CENTRE", "CENTRE AVANT"]) || position.includes("AVANT CENTRE")) return { role: "striker" };
   if (includes(position, rules.forward)) return { role: "forward" };
@@ -297,6 +302,38 @@ function optimizeAssignment(
         used.add(choice.id);
         assignment.set(index, choice);
       }
+    }
+  }
+
+  // Filet de sécurité « aucun poste Libre avec des remplaçants disponibles » :
+  // s'il reste des postes de champ vides et des joueurs de champ non placés,
+  // on les affecte à la ligne la plus proche de leur poste (un attaquant vers
+  // l'attaque, un défenseur vers la défense…). Le but reste interdit à tout
+  // joueur de champ et aucun gardien ne sort jamais de sa cage.
+  const roleLine = (role: PositionRole) =>
+    role === "goalkeeper" ? 0
+    : role === "central-defender" || role === "fullback" || role === "defender" ? 1
+    : role === "defensive-mid" ? 2
+    : role === "midfielder" || role === "attacking-mid" || role === "wing" ? 3
+    : role === "forward" || role === "striker" || role === "center" ? 4
+    : 3;
+  const emptyFieldSlots = slots
+    .map((slot, index) => ({ slot, index }))
+    .filter(({ slot, index }) => !assignment.has(index) && profileFormationSlot(slot, sport).role !== "goalkeeper");
+  if (emptyFieldSlots.length > 0) {
+    const remaining = players.filter(player =>
+      ![...assignment.values()].some(assigned => assigned.id === player.id) &&
+      profilePlayerPosition(player.position, sport).role !== "goalkeeper",
+    );
+    for (const { slot, index } of emptyFieldSlots) {
+      const wantedLine = roleLine(profileFormationSlot(slot, sport).role);
+      const choice = remaining
+        .map(player => ({ player, line: roleLine(profilePlayerPosition(player.position, sport).role) }))
+        .sort((a, b) =>
+          Math.abs(a.line - wantedLine) - Math.abs(b.line - wantedLine) || b.player.rating - a.player.rating)[0];
+      if (!choice) break;
+      assignment.set(index, choice.player);
+      remaining.splice(remaining.findIndex(player => player.id === choice.player.id), 1);
     }
   }
 
