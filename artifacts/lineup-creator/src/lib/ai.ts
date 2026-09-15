@@ -56,6 +56,8 @@ export function generateSquadFromCriteria(criteria: {
   ratingMax: number;
   nationality: string;
   positions: string;
+  /** Répartition optionnelle des nationalités, ex. [{ nationality: "BR", percent: 40 }] */
+  nationalityMix?: Array<{ nationality: string; percent: number }>;
 }) {
   return postAi("/ai/squad-from-criteria", { criteria });
 }

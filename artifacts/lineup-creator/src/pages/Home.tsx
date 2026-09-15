@@ -370,10 +370,13 @@ export default function Home() {
     const used = new Set(chosen.flatMap(({ player }) => player ? [player.id] : []));
     const nextPlayers = selectedFormation.positions.map((slot, index) => {
       const choice = chosen[index]?.player;
+      // Poste sans joueur compatible : slot "Libre" (identité négative pour ne
+      // pas heurter la clé player-0), pas un faux joueur prétendument placé.
+      const isEmptySlot = !choice || choice.rating <= 0;
       return {
-        id: choice?.id ?? `empty-${index}`,
-        name: choice?.name ?? `Joueur ${index + 1}`,
-        number: choice?.number ?? String(index + 1),
+        id: isEmptySlot ? `empty-${club.id}-${index}` : (choice?.id ?? `empty-${index}`),
+        name: isEmptySlot ? "Libre" : (choice?.name ?? `Joueur ${index + 1}`),
+        number: isEmptySlot ? "—" : (choice?.number ?? String(index + 1)),
         position: slot.label,
         nationality: resolveCountryCode(choice?.nationality ?? "ISTANMUSTA"),
         club: club.name,

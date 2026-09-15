@@ -219,7 +219,21 @@ router.post("/ai/squad-from-criteria", async (req, res) => {
   const ratingMax = Math.max(ratingMin, clamp(criteria?.ratingMax, ratingMin, 99, 85));
   const nationality = text(criteria?.nationality, "ISTANMUSTA", 32);
   const positions = text(criteria?.positions, sport === "hockey" ? "G, DG, DD, C, AG, AD" : "GB, DC, AG, AD, MDC, MC, MOC, BU", 160);
-  await generateRoster(req, res, `Génère ${count} joueurs pour le club "${clubName}" en ${sport}. Âge entre ${ageMin} et ${ageMax}. OVR entre ${ratingMin} et ${ratingMax}. Nationalité préférée: ${nationality}. Répartis les joueurs sur ces postes: ${positions}. Utilise des noms crédibles et des numéros uniques. Si la nationalité est ISTANMUSTA, utilise les prénoms et noms du pays fictif.`);
+  // Répartition optionnelle des nationalités : [{ nationality, percent }].
+  // Exemple : 40% BR, 30% FR — le reste de l'effectif garde la nationalité
+  // par défaut. Les parts sont arrondies au joueur près par le modèle.
+  const nationalityMix = (Array.isArray(criteria?.nationalityMix) ? criteria.nationalityMix : [])
+    .map((entry: unknown) => (entry && typeof entry === "object" ? entry as Record<string, unknown> : {}))
+    .map((entry: Record<string, unknown>) => ({
+      nationality: text(entry.nationality, "", 32),
+      percent: clamp(entry.percent, 1, 100, 0),
+    }))
+    .filter((entry: { nationality: string; percent: number }) => entry.nationality && entry.percent > 0)
+    .slice(0, 8);
+  const mixInstructions = nationalityMix.length > 0
+    ? ` Répartition stricte des nationalités : ${nationalityMix.map((mix: { nationality: string; percent: number }) => `${mix.percent}% de joueurs ${mix.nationality}`).join(", ")} (arrondie au joueur près) ; les joueurs restants gardent la nationalité ${nationality}.`
+    : "";
+  await generateRoster(req, res, `Génère ${count} joueurs pour le club "${clubName}" en ${sport}. Âge entre ${ageMin} et ${ageMax}. OVR entre ${ratingMin} et ${ratingMax}. Nationalité préférée: ${nationality}.${mixInstructions} Répartis les joueurs sur ces postes: ${positions}. Utilise des noms crédibles et des numéros uniques. Si la nationalité est ISTANMUSTA, utilise les prénoms et noms du pays fictif.`);
 });
 
 router.post("/ai/best-xi", async (req, res) => {

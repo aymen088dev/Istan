@@ -179,21 +179,25 @@ function optimizeAssignment(
 ) {
   const used = new Set<string>();
   const assignment = new Map<number, AnalysisPlayer>();
+  // Règle absolue : un joueur n'est JAMAIS placé sur un poste incompatible
+  // (score 0). Concrètement, aucun joueur de champ ne finit au but et aucun
+  // gardien ne finit sur le terrain. Un poste sans joueur compatible reste
+  // simplement vide (affiché "Libre") plutôt que mal occupé.
+  const isCompatible = (slot: FormationSlot, player: AnalysisPlayer) => positionScore(slot, player, sport) > 0;
   const ordered = slots.map((slot, index) => ({
     slot,
     index,
-    options: players.filter(player => positionScore(slot, player, sport) > 0).length,
+    options: players.filter(player => isCompatible(slot, player)).length,
   })).sort((a, b) => a.options - b.options || b.slot.y - a.slot.y);
 
   for (const { slot, index } of ordered) {
-    const candidates = players
-      .filter(player => !used.has(player.id))
+    const choice = players
+      .filter(player => !used.has(player.id) && isCompatible(slot, player))
       .sort((a, b) => {
         const valueDifference = assignmentValue(slot, b, sport) - assignmentValue(slot, a, sport);
         if (valueDifference !== 0) return valueDifference;
         return (aiPriority?.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (aiPriority?.get(b.id) ?? Number.MAX_SAFE_INTEGER);
-      });
-    const choice = candidates[0];
+      })[0];
     if (choice) {
       used.add(choice.id);
       assignment.set(index, choice);
@@ -218,7 +222,7 @@ function optimizeAssignment(
       const slot = slots[index];
       // 1) Un joueur compatible non encore placé ?
       const compatible = fieldPlayers
-        .filter(player => !used.has(player.id))
+        .filter(player => !used.has(player.id) && isCompatible(slot, player))
         .sort((a, b) => assignmentValue(slot, b, sport) - assignmentValue(slot, a, sport))[0];
       if (compatible) {
         used.add(compatible.id);
@@ -227,9 +231,11 @@ function optimizeAssignment(
         continue;
       }
       // 2) Sinon : échange contre le pire joueur de champ déjà placé, si cela
-      // améliore la compatibilité totale (score de poste + note).
+      // améliore la compatibilité totale (score de poste + note) et que ce
+      // joueur reste compatible avec le poste à remplir.
       const swap = fieldPlayers
         .filter(player => ![...assignment.values()].some(assigned => assigned.id === player.id))
+        .filter(player => isCompatible(slot, player))
         .sort((a, b) => b.rating - a.rating)[0]
         ?? [...assignment.entries()]
           .filter(([candidateIndex]) => fieldSlots.includes(candidateIndex))
@@ -249,11 +255,13 @@ function optimizeAssignment(
       assignment.set(index, swap);
       unfilled.delete(index);
     }
-    // Les slots vidés par l'échange sont re-remplis avec les restants.
+    // Les slots vidés par l'échange sont re-remplis avec les restants
+    // compatibles uniquement.
     const leftovers = fieldPlayers.filter(player => !used.has(player.id));
     for (const index of unfilled) {
       const slot = slots[index];
       const choice = leftovers
+        .filter(player => isCompatible(slot, player))
         .sort((a, b) => assignmentValue(slot, b, sport) - assignmentValue(slot, a, sport))[0];
       if (choice) {
         used.add(choice.id);
@@ -271,6 +279,9 @@ function optimizeAssignment(
       if (!current) continue;
       for (const candidate of players) {
         if (candidate.id === current.id) continue;
+        // Jamais de candidat incompatible (score 0), sinon un gardien ou un
+        // joueur hors poste pourrait être réintroduit par l'affinage.
+        if (!isCompatible(slot, candidate)) continue;
         const otherIndex = [...assignment.entries()].find(([, player]) => player.id === candidate.id)?.[0];
         const currentValue = assignmentValue(slot, current, sport);
         const candidateValue = assignmentValue(slot, candidate, sport);

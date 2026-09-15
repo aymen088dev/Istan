@@ -21,7 +21,7 @@ Sur Pterodactyl : téléversez le projet, `node start.js`, c'est tout. Voir [PTE
 ## ✨ 8 features spéciales
 
 ### 1. 🧠 Best XI intelligent (deterministic + IA)
-L'algorithme local optimise **poste naturel, côté gauche/droit, note OVR et gardien** ensemble, puis affine avec des échanges correctifs. L'IA Groq (optionnelle) ne fait que départager les égalités — jamais de placement absurde. **Garantie : chaque poste reçoit un joueur au poste exact ou compatible** (jamais un gardien déplacé au milieu).
+L'algorithme local optimise **poste naturel, côté gauche/droit, note OVR et gardien** ensemble, puis affine avec des échanges correctifs. L'IA Groq (optionnelle) ne fait que départager les égalités — jamais de placement absurde. **Garanties : chaque poste reçoit un joueur au poste exact ou compatible, un gardien ne quitte jamais le but, un joueur de champ n'y est jamais envoyé, et un poste sans joueur compatible est affiché « Libre »** au lieu d'être occupé par un faux joueur.
 
 ### 2. 📊 Analyse poste par poste de toutes les formations
 Pour chaque effectif, l'app note les **~65 systèmes football + 22 systèmes hockey** : compatibilité moyenne, postes naturels exacts, adaptations, gardien prêt, recommandation de meilleure formation et alertes par poste. Export JSON complet en un clic.
@@ -42,7 +42,7 @@ Clubs, effectifs, compositions et **logos** partagés entre tous les visiteurs d
 Les logos importés ne polluent plus les données en base64 : ils sont stockés dans **`data/uploads/`** (PNG/JPG/WEBP/GIF/SVG, 3 Mo max) et servis via `/api/uploads/<fichier>` avec cache immuable. Payloads légers, synchronisation rapide, compatible stockage persistant Pterodactyl.
 
 ### 8. ✍️ Génération d'effectifs par IA (Groq)
-Collez un texte brut (liste de joueurs, page Wikipédia…) → effectif structuré complet. Ou générez par critères : nombre, âge min/max, OVR min/max, nationalité, postes. Les joueurs générés restent modifiables et s'ajoutent à l'effectif du club.
+Collez un texte brut (liste de joueurs, page Wikipédia…) → effectif structuré complet. Ou générez par critères : nombre, âge min/max, OVR min/max, nationalité, postes — avec **répartition en % des nationalités** (ex. 40% BR, 30% FR, le reste prend la nationalité par défaut). Les joueurs générés restent modifiables et s'ajoutent à l'effectif du club.
 
 ---
 

@@ -101,6 +101,10 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
     nationality: "ISTANMUSTA",
     positions: sport === "hockey" ? "G, DG, DD, C, AG, AD" : "GB, DG, DC, DD, MDC, MC, MOC, AG, AD, BU",
   });
+  // Répartition des nationalités en % : [{ nationality, percent }] avec des
+  // lignes ajoutables/supprimables. Les parts n'ont pas à totaliser 100 :
+  // le reste de l'effectif garde la nationalité par défaut.
+  const [nationalityMix, setNationalityMix] = useState<Array<{ nationality: string; percent: number }>>([]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
   const [analysisOpen, setAnalysisOpen] = useState(false);
@@ -212,6 +216,7 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
         sport,
         clubName: club.name,
         ...criteria,
+        nationalityMix: nationalityMix.filter(line => line.nationality.trim() && line.percent > 0),
       }));
     } catch (generationError) {
       setError(generationError instanceof Error ? generationError.message : "La génération a échoué.");
@@ -415,6 +420,52 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
             </div>
             <Input value={criteria.positions} onChange={event => setCriteria(c => ({ ...c, positions: event.target.value }))} placeholder="Postes séparés par des virgules" className="h-8 text-xs" />
             <Input value={criteria.nationality} onChange={event => setCriteria(c => ({ ...c, nationality: event.target.value.toUpperCase() }))} placeholder="Nationalité, ex. ISTANMUSTA" className="h-8 text-xs" />
+
+            <div className="space-y-1.5 rounded-lg border border-border/50 bg-muted/10 p-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px]">Répartition par nationalité (%)</Label>
+                <button
+                  type="button"
+                  onClick={() => setNationalityMix(lines => [...lines, { nationality: "", percent: 25 }])}
+                  className="flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-[10px] font-bold text-primary transition-colors hover:bg-primary/25"
+                >
+                  <Plus className="h-3 w-3" /> Ajouter
+                </button>
+              </div>
+              {nationalityMix.length === 0 ? (
+                <p className="text-[10px] text-muted-foreground">Optionnel — ex. 40% BR, 30% FR. Le reste garde la nationalité par défaut.</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {nationalityMix.map((line, index) => (
+                    <div key={index} className="flex items-center gap-1.5">
+                      <Input
+                        value={line.nationality}
+                        onChange={event => setNationalityMix(lines => lines.map((item, i) => i === index ? { ...item, nationality: event.target.value.toUpperCase() } : item))}
+                        placeholder="BR"
+                        className="h-7 flex-1 text-xs uppercase"
+                      />
+                      <Input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={line.percent}
+                        onChange={event => setNationalityMix(lines => lines.map((item, i) => i === index ? { ...item, percent: Number(event.target.value) } : item))}
+                        className="h-7 w-16 shrink-0 text-center text-xs"
+                      />
+                      <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">%</span>
+                      <button
+                        type="button"
+                        aria-label="Retirer cette nationalité"
+                        onClick={() => setNationalityMix(lines => lines.filter((_, i) => i !== index))}
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <Button type="button" onClick={generateFromCriteria} disabled={generating} className="w-full gap-2">
               <Sparkles className="h-3.5 w-3.5" />
               {generating ? "Génération en cours…" : "Générer l’effectif"}
