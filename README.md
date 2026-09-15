@@ -33,7 +33,7 @@ Pour chaque effectif, l'app note les **~65 systèmes football + 22 systèmes hoc
 12 pelouses football et 6 glaces hockey (standard, nuit, rétro, indoor, or, marine…), couleur de gazon personnalisée, image de fond importée, overlay coloré avec opacité réglable, logo d'équipe positionné, titre et score du match personnalisables.
 
 ### 5. 📲 UI mobile-first pensée pour le partage
-Grille de contrôles rapides, panneau remplaçants en bottom-sheet, **menu club en bottom-sheet repensé** (statistiques GEN/âge, actions en tuiles), safe-area iOS, navigation 3 onglets (Terrain / Options / Biblio). Export PNG haute résolution ×2 optimisé pour les bancs chargés.
+Grille de contrôles rapides, panneau remplaçants en bottom-sheet, **menu club en bottom-sheet à 3 onglets** (Aperçu / Matchs / Effectif), **effectif en fenêtre plein écran** (plus aucun panneau invisible coincé sous la grille), safe-area iOS, navigation 3 onglets (Terrain / Options / Biblio). Export PNG haute résolution ×2 optimisé pour les bancs chargés.
 
 ### 6. 🏟️ Multi-utilisateur temps quasi-réel, zéro base complexe
 Clubs, effectifs, compositions et **logos** partagés entre tous les visiteurs du serveur : JSON persistant (`data/lineup-shared.json`) ou PostgreSQL si `DATABASE_URL` est défini. Polling intelligent (5 s) avec détection de changement — aucun re-rendu inutile, aucun clignotement, aucun rechargement de page.
@@ -46,13 +46,27 @@ Collez un texte brut (liste de joueurs, page Wikipédia…) → effectif structu
 
 ---
 
+## 🆕 Menu club — redesign complet (8 nouveautés)
+
+1. **Recherche instantanée** — trouve un club en tapant son nom, bouton d'effacement rapide.
+2. **Tri intelligent** — par GEN moyen, par nom ou par taille d'effectif, plus filtre Clubs / Sélections.
+3. **Favoris synchronisés** — étoile un club : l'état est persisté sur le serveur et partagé avec tout le monde.
+4. **Aperçu du Meilleur XI sur mini-terrain** — la meilleure formation est détectée automatiquement parmi tous les systèmes, avec les joueurs, leur % de compatibilité et le bilan postes naturels. Mêmes règles que le placement réel.
+5. **Distribution par poste** — barres GB / DEF / MIL / ATT calculées par le référentiel de postes, avec filtres cliquables dans l'onglet Effectif.
+6. **Feuille de match & trophées** — enregistre les résultats (adversaire, score), bilan V-N-D, buts pour/contre, historique daté supprimable, persisté côté serveur.
+7. **Duplication de club** — copie complète d'un club (couleurs, maillot, effectif) sans l'historique de matchs, en un clic.
+8. **Export CSV de l'effectif** — fichier Excel/LibreOffice compatible (UTF-8 BOM, séparateur `;`) avec nom, poste, numéro, âge, OVR et nationalité.
+
+Le menu s'ouvre en cliquant sur un club : hero dégradé aux couleurs du club, 3 onglets (Aperçu / Matchs / Effectif), et l'**effectif complet s'ouvre en fenêtre plein écran** — le bug d'affichage sous la grille est réglé.
+
+---
+
 ## 🗂️ Structure
 
 ```
 artifacts/
   lineup-creator/     # Frontend React + Vite + Tailwind + shadcn/ui
   api-server/         # API Express 5 (IA, clubs, compositions, uploads)
-  mockup-sandbox/     # Bac à sable de maquettes
 lib/
   api-spec/           # OpenAPI + génération orval
   api-client-react/   # Client API React généré

@@ -11,6 +11,13 @@ import {
   type SharedRosterPlayer,
 } from "@workspace/db";
 
+type MatchRecord = {
+  opponent: string;
+  scored: number;
+  conceded: number;
+  playedAt: number;
+};
+
 type ClubPayload = {
   id: string;
   name: string;
@@ -23,6 +30,8 @@ type ClubPayload = {
   backgroundId: string;
   category: "club" | "selection";
   roster?: SharedRosterPlayer[];
+  isFavorite?: boolean;
+  matchHistory?: MatchRecord[];
 };
 
 type CompositionPayload = {
@@ -89,6 +98,21 @@ function normalizeClub(body: unknown, id?: string): ClubPayload | null {
     backgroundId: validText(value.backgroundId, "football-standard", 80),
     category: value.category === "selection" ? "selection" : "club",
     roster: normalizeRoster(value.roster),
+    // Champs optionnels du nouveau menu club : favori synchronisé et
+    // historique des matchs (trophées feuille de match).
+    isFavorite: value.isFavorite === true ? true : undefined,
+    matchHistory: (Array.isArray(value.matchHistory) ? value.matchHistory : [])
+      .filter(item => item && typeof item === "object")
+      .slice(0, 50)
+      .map((item, index) => {
+        const record = item as Record<string, unknown>;
+        return {
+          opponent: validText(record.opponent, `Adversaire ${index + 1}`, 120),
+          scored: Math.max(0, Math.min(99, Number(record.scored) || 0)),
+          conceded: Math.max(0, Math.min(99, Number(record.conceded) || 0)),
+          playedAt: Number(record.playedAt) || Date.now(),
+        };
+      }),
   };
 }
 
