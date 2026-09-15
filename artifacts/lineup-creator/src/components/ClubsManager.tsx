@@ -180,10 +180,18 @@ const POSITION_FILTERS: Array<{ id: PositionFilter; label: string }> = [
    exactement les mêmes règles que le placement réel (analyzeFormation) et la
    meilleure formation automatiquement détectée.
    ───────────────────────────────────────────────────────────────────────── */
+/* Cache du meilleur XI par (effectif, sport) : ouvrir une fiche club,
+   changer d'onglet puis revenir est instantané — l'analyse des ~65 formations
+   ne relance que si l'effectif a réellement changé. */
+const miniXICache = new Map<string, ReturnType<typeof analyzeFormation>>();
+
 const MiniXI = memo(function MiniXI({ club, sport }: { club: Club; sport: AnalysisSport }) {
   const roster = club.roster ?? [];
   const best = useMemo(() => {
     if (roster.length === 0) return null;
+    const cacheKey = `${sport}:${roster.map(player => `${player.id}:${player.position}:${player.rating}`).join("|")}`;
+    const cached = miniXICache.get(cacheKey);
+    if (cached) return cached;
     const formations = (sport === "football" ? FOOTBALL_FORMATIONS : HOCKEY_FORMATIONS) as FormationMap;
     const normalizedRoster = roster.map((player, index) => normalizeAnalysisPlayer(player, index));
     let bestName = Object.keys(formations)[0];
@@ -195,7 +203,10 @@ const MiniXI = memo(function MiniXI({ club, sport }: { club: Club; sport: Analys
         bestName = name;
       }
     }
-    return analyzeFormation(bestName, formations[bestName], normalizedRoster, sport);
+    const result = analyzeFormation(bestName, formations[bestName], normalizedRoster, sport);
+    if (miniXICache.size > 24) miniXICache.clear();
+    miniXICache.set(cacheKey, result);
+    return result;
   }, [roster, sport]);
 
   if (!best) {

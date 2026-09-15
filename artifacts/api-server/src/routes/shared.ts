@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, open, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { desc, eq } from "drizzle-orm";
 import {
@@ -145,13 +145,38 @@ async function readFileStore(): Promise<FileStore> {
   try {
     return JSON.parse(await readFile(filePath, "utf8")) as FileStore;
   } catch {
-    return { clubs: [], compositions: [] };
+    // Fichier principal illisible (écriture interrompue, crash…) : on tente
+    // la sauvegarde .bak écrite lors de la précédente écriture réussie.
+    try {
+      return JSON.parse(await readFile(`${filePath}.bak`, "utf8")) as FileStore;
+    } catch {
+      return { clubs: [], compositions: [] };
+    }
   }
 }
 
+/**
+ * Écriture atomique + sauvegarde : le JSON est d'abord écrit dans un fichier
+ * temporaire (fsync), puis renommé — un lecteur ne peut jamais tomber sur un
+ * fichier à moitié écrit, et la version précédente reste disponible en .bak
+ * si le processus meurt pendant le rename.
+ */
 async function writeFileStore(store: FileStore) {
   await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(store, null, 2), "utf8");
+  const tmp = `${filePath}.tmp`;
+  const payload = JSON.stringify(store, null, 2);
+  const handle = await writeFile(tmp, payload, "utf8").then(() => open(tmp, "r+"));
+  try {
+    await handle.sync();
+  } finally {
+    await handle.close();
+  }
+  // Le .bak précédent est remplacé après la réussite du rename.
+  await rename(tmp, filePath).catch(async error => {
+    await unlink(tmp).catch(() => undefined);
+    throw error;
+  });
+  await writeFile(`${filePath}.bak`, payload, "utf8").catch(() => undefined);
 }
 
 function clubFromRow(row: typeof lineupClubsTable.$inferSelect): ClubPayload {

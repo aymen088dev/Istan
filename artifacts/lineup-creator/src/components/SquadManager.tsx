@@ -123,9 +123,11 @@ export function SquadManager({ club, onChange, onBestXI, onBestXIAI, onRecommend
     () => analyzeFormation(activeFormation, formationMap[activeFormation], analysisRoster, sport as AnalysisSport),
     [activeFormation, formationMap, analysisRoster, sport],
   );
+  // L'analyse des ~65 formations ne tourne que lorsque le panneau d'analyse
+  // est ouvert : en édition courante, zéro coût CPU par frappe clavier.
   const recommendedFormation = useMemo(
-    () => analyzeAllFormations(formationMap, analysisRoster, sport as AnalysisSport)[0],
-    [formationMap, analysisRoster, sport],
+    () => analysisOpen ? analyzeAllFormations(formationMap, analysisRoster, sport as AnalysisSport)[0] : null,
+    [analysisOpen, formationMap, analysisRoster, sport],
   );
   const rosterDiagnosis = useMemo(
     () => diagnoseRoster(roster, sport as AnalysisSport),

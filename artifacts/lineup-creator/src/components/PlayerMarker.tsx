@@ -81,6 +81,11 @@ export function PlayerMarker({
   useEffect(() => { latestPlayer.current = player; }, [player]);
   useEffect(() => { latestOnUpdate.current = onUpdate; }, [onUpdate]);
 
+  // Poste laissé volontairement vide (aucun joueur compatible) : rendu
+  // fantôme en pointillés, sans interactions, pour le distinguer d'un vrai
+  // joueur — on ne clique pas un emplacement vide.
+  const isEmptySlot = player.name === "Libre" && player.rating === 0;
+
   useEffect(() => {
     const el = elRef.current;
     if (!el) return;
@@ -173,6 +178,40 @@ export function PlayerMarker({
     if (r >= 80) return "#14532d";
     if (r >= 70) return "#1e3a5f";
     return "#3f1d1d";
+  }
+
+  if (isEmptySlot) {
+    return (
+      <div
+        className="absolute flex flex-col items-center select-none pointer-events-none z-5"
+        style={{
+          left: `${x}%`,
+          top: `${player.y}%`,
+          transform: "translate(-50%, -50%)",
+        }}
+        aria-label={`Poste ${player.position} libre`}
+      >
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed sm:h-10 sm:w-10 md:h-11 md:w-11"
+          style={{
+            borderColor: "rgba(255,255,255,0.32)",
+            background: "rgba(0,0,0,0.28)",
+          }}
+        >
+          <span className="text-[9px] font-black uppercase tracking-wider text-white/45">{player.position}</span>
+        </div>
+        <span
+          className="mt-1 rounded px-1.5 py-[3px] text-[7px] font-bold uppercase leading-none tracking-widest"
+          style={{
+            background: "rgba(0,0,0,0.5)",
+            border: "1px dashed rgba(255,255,255,0.25)",
+            color: "rgba(255,255,255,0.55)",
+          }}
+        >
+          Libre
+        </span>
+      </div>
+    );
   }
 
   return (
