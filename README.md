@@ -46,9 +46,9 @@ Collez un texte brut (liste de joueurs, page Wikipédia…) → effectif structu
 
 ---
 
-## 🎨 7 thèmes d'apparence (onglet Options → Thème)
+## 🎨 16 thèmes d'apparence (onglet Options → Thème)
 
-Un nouvel onglet **Thème** dans Options permet de choisir parmi 7 ambiances, appliquées instantanément à **tout le site** (header, onglets, cadres, boutons, dialogs, halos) et mémorisées sur l'appareil :
+Un onglet **Thème** dans Options permet de choisir parmi 16 ambiances, appliquées instantanément à **tout le site** (header, onglets, cadres, boutons, dialogs, halos) et mémorisées sur l'appareil :
 
 1. **Émeraude Néon** — violet → bleu → vert (thème signature)
 2. **Océan Profond** — bleus marins et cyans glacés
@@ -57,6 +57,25 @@ Un nouvel onglet **Thème** dans Options permet de choisir parmi 7 ambiances, ap
 5. **Forêt Sombre** — verts profonds et citronnelle
 6. **Minuit Glacé** — ardoise froide et bleu cristal
 7. **Lave Ardente** — rouge braise sur basalte noir
+8. **Aurore Boréale** — vert laiteux, cyan et violet du Grand Nord
+9. **Tokyo Néon** — nuits cyberpunk, rose électrique et cyan
+10. **Désert Doré** — sables chauds, ambre et cuir vieilli
+11. **Iceberg Polaire** — blancs bleutés et glace éternelle
+12. **Matrix** — pluie de code verte sur terminal noir
+13. **Barbe à Papa** — roses sucrées et violets pastels
+14. **Retro 90** — courts de tennis vintage, teal et corail
+15. **Nuit de Stade** — projecteurs blancs sur pelouse nocturne
+16. **Ballon d'Or** — or massif, noir laqué et prestige
+
+---
+
+## 🃏 Outils & Simulateur (Options → Général)
+
+1. **⚽ Simulateur de match** — Mon XI contre les remplaçants ou une équipe générée au niveau équivalent. Score **déterministe** (même compo = même résultat), chronologie des buts minute par minute, buteurs pondérés par la note, MVP, possession, tirs et passes réussies.
+2. **🔀 Équipes équilibrées** — répartit le terrain en deux équipes de force égale (tirage « serpent » par note), moyennes affichées.
+3. **🎯 Replacer en formation** — remet chaque joueur exactement sur son slot de formation après des déplacements libres.
+4. **📸 Snapshots de compo** — sauvegarde l'état complet du terrain (formation, joueurs, banc, couleurs) en un clic, restaure en un clic — pratique avant d'essayer un Best XI. 12 snapshots maximum, raccourci « Snap » dans la barre rapide mobile.
+5. **💾 Sauvegarde complète JSON** — exporte tout (clubs, effectifs, compositions, bibliothèque joueurs, snapshots) dans un fichier téléchargeable, et le restaure avec fusion intelligente (par identifiant, sans doublon) — idéal pour migrer de serveur Pterodactyl.
 
 ---
 

@@ -4,6 +4,7 @@ import {
   Download, Hash, FlipHorizontal2, RotateCcw, Shuffle, Swords,
   Upload, Image as ImageIcon, Palette, Home as HomeIcon, Settings, BookOpen,
   Plus, Minus, Trash2, Users, ChevronDown, X, Pencil, LayoutGrid,
+  Play, Camera, FileDown, FileUp, Crosshair, History, Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,10 @@ import { upsertPlayersInLibrary } from "@/lib/playerLibrary";
 import { chooseBestXI, normalizeAnalysisPlayer } from "@/lib/formationAnalysis";
 import { suggestBestXI } from "@/lib/ai";
 import { THEMES, DEFAULT_THEME, loadTheme, saveTheme, applyTheme, type AppTheme } from "@/lib/themes";
+import { MatchSimulator } from "@/components/MatchSimulator";
+import { balancedTeams, snapPlayersToFormation, averageRating } from "@/lib/teamTools";
+import { loadSnapshots, saveSnapshots, makeSnapshot, type PitchSnapshot } from "@/lib/pitchSnapshots";
+import { downloadBackup, restoreBackup, readBackupFile } from "@/lib/backup";
 
 /** Extrait le n-ième hex d'un dégradé CSS (0 = premier, -1 = dernier) pour l'aperçu des thèmes. */
 function mixPreview(gradient: string, index: number) {
@@ -253,6 +258,9 @@ export default function Home() {
   const [exporting, setExporting] = useState(false);
   const [mobilePage, setMobilePage] = useState<"accueil" | "parametres" | "bibliotheque">("accueil");
   const [appTheme, setAppTheme] = useState<AppTheme>(() => DEFAULT_THEME);
+  const [simOpen, setSimOpen] = useState(false);
+  const [snapshots, setSnapshots] = useState<PitchSnapshot[]>([]);
+  const [toolMessage, setToolMessage] = useState("");
 
   /* Bench panel state (mobile) */
   const [benchPanelOpen, setBenchPanelOpen] = useState(false);
@@ -320,6 +328,84 @@ export default function Home() {
   const updateBenchPlayer = (id: string, u: Partial<Player>) => setBench(p => p.map(x => x.id === id ? { ...x, ...u } : x));
 
   const handleReset = () => { setPlayers(initPlayers(sport, formation)); setBench(buildBench(sport)); };
+
+  /* ── Outils d'équipe (carte blanche) ── */
+  const flashToolMessage = (message: string) => {
+    setToolMessage(message);
+    window.setTimeout(() => setToolMessage(current => (current === message ? "" : current)), 3200);
+  };
+
+  /** Répartit le terrain en deux équipes équilibrées (bleus vs rouges via position). */
+  const handleShuffleTeams = () => {
+    const lineup = players.filter(p => p.name.trim() && p.name.trim().toLowerCase() !== "libre");
+    if (lineup.length < 4) {
+      flashToolMessage("Il faut au moins 4 joueurs pour répartir les équipes.");
+      return;
+    }
+    const { a, b } = balancedTeams(lineup);
+    const avgA = averageRating(a);
+    const avgB = averageRating(b);
+    // Marquage visuel : on trie le terrain par équipe (A à gauche, B à droite).
+    setPlayers(previous => {
+      const libre = previous.filter(p => !p.name.trim() || p.name.trim().toLowerCase() === "libre");
+      return [...a, ...b, ...libre];
+    });
+    flashToolMessage(`Équipes équilibrées — Équipe A (moy. ${avgA}) vs Équipe B (moy. ${avgB}). L'ordre du terrain les regroupe.`);
+  };
+
+  /** Remet chaque joueur exactement sur son slot de formation. */
+  const handleSnapToFormation = () => {
+    setPlayers(previous => snapPlayersToFormation(previous, formation, sport));
+    flashToolMessage("Joueurs remis en place sur la formation.");
+  };
+
+  /** Sauvegarde un snapshot de la compo courante. */
+  const handleSaveSnapshot = () => {
+    const snapshot = makeSnapshot(`${title || formation} · ${new Date().toLocaleDateString()}`, {
+      sport, formation, title, players, bench,
+      jerseyColor, secondaryColor, accentColor, numberColor,
+      jerseyStyle: jerseyStyle as string, backgroundId,
+    });
+    const updated = [snapshot, ...loadSnapshots()].slice(0, 12);
+    saveSnapshots(updated);
+    setSnapshots(updated);
+    flashToolMessage(`Snapshot « ${snapshot.name} » enregistré.`);
+  };
+
+  /** Restaure un snapshot. */
+  const handleRestoreSnapshot = (snapshot: PitchSnapshot) => {
+    const data = snapshot.data;
+    setSport(data.sport); setFormation(data.formation); setTitle(data.title);
+    setPlayers(data.players); setBench(data.bench);
+    setJerseyColor(data.jerseyColor); setSecondaryColor(data.secondaryColor);
+    setAccentColor(data.accentColor); setNumberColor(data.numberColor);
+    setJerseyStyle((data.jerseyStyle as JerseyStyle) ?? "plain");
+    setBackgroundId(data.backgroundId);
+    setMobilePage("accueil");
+    flashToolMessage(`Snapshot « ${snapshot.name} » restauré.`);
+  };
+
+  const handleDeleteSnapshot = (id: string) => {
+    const updated = snapshots.filter(s => s.id !== id);
+    saveSnapshots(updated);
+    setSnapshots(updated);
+  };
+
+  /** Export/Import de la sauvegarde complète. */
+  const handleExportBackup = () => {
+    downloadBackup();
+    flashToolMessage("Sauvegarde téléchargée (clubs, effectifs, compos, joueurs).");
+  };
+
+  const handleImportBackup = async (file: File) => {
+    try {
+      const payload = await readBackupFile(file);
+      const summary = restoreBackup(payload);
+      flashToolMessage(`Sauvegarde restaurée : ${summary.clubs} clubs, ${summary.compositions} compos, ${summary.players} joueurs.`);
+    } catch (error) {
+      flashToolMessage(error instanceof Error ? error.message : "Import impossible.");
+    }
+  };
   const handleAutoNumber = () => {
     setPlayers(p => p.map((x, i) => ({ ...x, number: `${i + 1}` })));
     setBench(p => p.map((x, i) => ({ ...x, number: `${players.length + i + 1}` })));
@@ -457,6 +543,11 @@ export default function Home() {
     setShowBench(c.showBench ?? true); setShowDetails(c.showDetails ?? false);
     setMobilePage("accueil");
   };
+
+  // Snapshots de compo : chargés une fois au montage.
+  useEffect(() => {
+    setSnapshots(loadSnapshots());
+  }, []);
 
   // Thème d'apparence : appliqué au site entier au montage et à chaque choix.
   useEffect(() => {
@@ -966,6 +1057,79 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Outils & Simulateur */}
+        <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 space-y-3">
+          <Label className="text-[10px] font-bold uppercase tracking-widest text-primary">Outils & Simulateur</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Button size="sm" onClick={() => setSimOpen(true)} className="flex-col h-12 gap-1 text-xs">
+              <Play className="w-4 h-4" />Simuler un match
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleShuffleTeams} className="flex-col h-12 gap-1 text-xs">
+              <Shuffle className="w-4 h-4" />Équipes équilibrées
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSnapToFormation} className="flex-col h-12 gap-1 text-xs">
+              <Crosshair className="w-4 h-4" />Replacer en formation
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSaveSnapshot} className="flex-col h-12 gap-1 text-xs">
+              <Camera className="w-4 h-4" />Snapshot compo
+            </Button>
+          </div>
+          {toolMessage && (
+            <p className="text-[11px] text-primary leading-relaxed" role="status">{toolMessage}</p>
+          )}
+        </div>
+
+        {/* Snapshots recents */}
+        {snapshots.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <History className="w-3 h-3" />Snapshots récents
+            </Label>
+            <div className="space-y-1.5">
+              {snapshots.slice(0, 5).map(snapshot => (
+                <div key={snapshot.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20 border border-border/40">
+                  <button className="flex-1 min-w-0 text-left" onClick={() => handleRestoreSnapshot(snapshot)}>
+                    <span className="block truncate text-xs font-semibold">{snapshot.name}</span>
+                    <span className="text-[10px] text-muted-foreground">{snapshot.data.formation} · {snapshot.data.players.length} joueurs · cliquer pour restaurer</span>
+                  </button>
+                  <button onClick={() => handleDeleteSnapshot(snapshot.id)} className="shrink-0 p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" aria-label="Supprimer le snapshot">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sauvegarde complete */}
+        <div className="rounded-xl border border-border/40 bg-muted/10 p-3 space-y-3">
+          <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sauvegarde</Label>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Exporte tout (clubs, effectifs, compos, joueurs, snapshots) dans un fichier JSON — ou restaure une sauvegarde.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportBackup} className="flex-col h-11 gap-1 text-xs">
+              <FileDown className="w-4 h-4" />Exporter tout
+            </Button>
+            <label className="cursor-pointer">
+              <span className="sr-only">Importer une sauvegarde</span>
+              <input
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (file) void handleImportBackup(file);
+                  event.target.value = "";
+                }}
+              />
+              <span className="flex items-center justify-center gap-1.5 h-9 px-3 rounded-md border border-border/60 bg-transparent text-xs font-medium hover:bg-muted/40 transition-colors w-full">
+                <FileUp className="w-4 h-4" />Importer
+              </span>
+            </label>
+          </div>
+        </div>
+
         {/* Actions rapides */}
         <div className="space-y-2">
           <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Actions</Label>
@@ -1179,6 +1343,7 @@ export default function Home() {
         style={{ background: "var(--theme-header)", backdropFilter: "blur(12px)" }}>
         {[
           { label: "N°", icon: <Hash className="w-3.5 h-3.5" />, action: handleAutoNumber, color: "" },
+          { label: "Snap",  icon: <Camera className="w-3.5 h-3.5" />, action: handleSaveSnapshot, color: "" },
           { label: "Miroir", icon: <FlipHorizontal2 className="w-3.5 h-3.5" />, action: handleMirror, color: "" },
           { label: "Reset",  icon: <RotateCcw className="w-3.5 h-3.5" />, action: handleReset, color: "text-destructive/80 border-destructive/25" },
         ].map(({ label, icon, action, color }) => (
@@ -1289,6 +1454,9 @@ export default function Home() {
         jerseyColor={jerseyColor}
         onSelect={f => { setFormation(f); setPlayers(initPlayers(sport, f)); }}
       />
+
+      {/* Match Simulator */}
+      <MatchSimulator open={simOpen} onOpenChange={setSimOpen} players={players} bench={bench} />
     </div>
   );
 }
