@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Carte du serveur</title>
+    <link rel="stylesheet" href="/map/styles.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"><i></i></span>
+        <div class="brand-text">
+          <h1>Carte du serveur</h1>
+          <p class="sub">
+            <span id="dim-label">overworld</span>
+            <span class="sep"></span>
+            <span id="chunk-count">0</span> chunks
+          </p>
+        </div>
+      </div>
+
+      <div class="tools">
+        <select id="dim-select" aria-label="Dimension"></select>
+
+        <div class="segment" id="view-toggle" role="group" aria-label="Mode d'affichage">
+          <button id="view-iso" type="button" title="Vue isométrique 3D">3D</button>
+          <button id="view-relief" type="button" class="active" title="Relief vu de dessus">Relief</button>
+        </div>
+
+        <div class="zoom">
+          <button id="zoom-out" type="button" title="Dézoomer" aria-label="Dézoomer">−</button>
+          <button id="zoom-reset" type="button" title="Recentrer" aria-label="Recentrer">◎</button>
+          <button id="zoom-in" type="button" title="Zoomer" aria-label="Zoomer">+</button>
+        </div>
+
+        <div class="pill" id="live">
+          <span class="dot"></span>
+          <span id="live-label">connexion…</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="stage">
+      <canvas id="map"></canvas>
+
+      <figure class="relief" id="relief-wrap" hidden>
+        <div class="viewport" id="relief-viewport">
+          <img id="relief" alt="Relief du monde vu de dessus" draggable="false" />
+        </div>
+        <figcaption id="relief-caption">relief vu de dessus · rendu serveur</figcaption>
+      </figure>
+
+      <aside class="players" id="players-panel" hidden>
+        <h2>Joueurs <span id="players-count">0</span></h2>
+        <ul id="players-list"></ul>
+      </aside>
+
+      <div class="hint" id="hint">glisser pour déplacer · molette pour zoomer · double-clic pour recentrer</div>
+      <div class="loader" id="loader"><span></span><b>chargement…</b></div>
+    </main>
+
+    <script src="/map/blocks.js"></script>
+    <script src="/map/map.js"></script>
+  </body>
+</html>

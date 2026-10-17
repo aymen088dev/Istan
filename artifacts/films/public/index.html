@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Films — ISTAN Projects & Litel</title>
+    <meta
+      name="description"
+      content="Les deux films d’ISTAN Projects au même endroit : le film du portail et la campagne Litel, en 9:16, avec voix off et sous-titres."
+    />
+    <link rel="preload" as="image" href="media/istan-poster.jpg" />
+    <style>
+      @font-face {
+        font-family: "Instrument Serif";
+        font-style: italic;
+        font-weight: 400;
+        font-display: swap;
+        src: url("media/fonts/instrument-serif-italic-400.woff2") format("woff2");
+      }
+
+      :root {
+        --bg: #08090b;
+        --surface: #101216;
+        --line: rgba(255, 255, 255, 0.09);
+        --text: #f2f1ec;
+        --muted: #8f959e;
+        --lime: #c8ff3d;
+        --yellow: #ffd400;
+        --red: #e63946;
+        --accent: var(--lime);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(900px 620px at 80% -10%, rgba(200, 255, 61, 0.1), transparent 62%),
+          radial-gradient(700px 520px at 0% 55%, rgba(139, 147, 255, 0.07), transparent 60%),
+          linear-gradient(180deg, #0a0b0e, #08090b 60%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 90px 90px;
+        mask-image: radial-gradient(85% 65% at 50% 0%, #000 15%, transparent 80%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 26px 22px 72px; }
+
+      header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 44px; }
+
+      .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
+
+      .mark {
+        width: 42px; height: 42px; border-radius: 12px;
+        background: var(--lime); color: #0a0b0d;
+        display: grid; place-items: center;
+        font-weight: 900; font-size: 21px; letter-spacing: -0.04em;
+        position: relative;
+      }
+      .mark::after {
+        content: ""; position: absolute; right: -3px; top: -3px;
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--bg); border: 2px solid var(--lime);
+      }
+
+      .brand-text { display: block; }
+      .brand-text b { display: block; font-size: 15px; font-weight: 800; letter-spacing: 0.02em; }
+      .brand-text span { display: block; font-size: 11px; letter-spacing: 0.18em; color: var(--muted); margin-top: 3px; }
+
+      .back {
+        text-decoration: none; color: var(--muted); font-size: 13px;
+        border: 1px solid var(--line); border-radius: 999px;
+        padding: 10px 16px; white-space: nowrap; transition: color .2s, border-color .2s, background .2s;
+      }
+      .back:hover { color: var(--text); border-color: rgba(200, 255, 61, 0.45); background: rgba(200, 255, 61, 0.06); }
+
+      .hero { padding-bottom: 54px; }
+
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: var(--muted); margin-bottom: 18px;
+      }
+      .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); }
+
+      h1 {
+        font-size: clamp(44px, 7vw, 88px);
+        line-height: 0.9;
+        letter-spacing: -0.05em;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      h1 em {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-style: italic; font-weight: 400; text-transform: none;
+        color: var(--lime); letter-spacing: -0.02em;
+      }
+
+      .hero p { margin-top: 20px; max-width: 62ch; font-size: 16px; line-height: 1.6; color: #b7bcc4; }
+      .hero p b { color: var(--text); font-weight: 600; }
+
+      .reel {
+        display: grid;
+        grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+        gap: 52px;
+        padding: 52px 0;
+        border-top: 1px solid var(--line);
+        align-items: start;
+      }
+
+      .reel.flip { grid-template-columns: minmax(0, 1fr) minmax(0, 380px); }
+      .reel.flip .stage-wrap { order: 2; }
+      .reel.flip .info { order: 1; }
+
+      .stage-wrap { position: relative; }
+
+      .stage {
+        padding: 10px;
+        border-radius: 26px;
+        background: linear-gradient(160deg, rgba(200, 255, 61, 0.28), rgba(255, 255, 255, 0.03));
+        border: 1px solid var(--line);
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+      }
+
+      .reel[data-film="litel"] .stage {
+        background: linear-gradient(160deg, rgba(255, 212, 0, 0.38), rgba(230, 57, 70, 0.18));
+      }
+
+      video { display: block; width: 100%; border-radius: 18px; background: #000; aspect-ratio: 9 / 16; }
+
+      .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
+      .pill {
+        font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+        border: 1px solid var(--line); border-radius: 999px;
+        padding: 7px 11px; color: var(--muted);
+      }
+      .pill b { color: var(--text); font-weight: 600; }
+
+      .kicker {
+        display: flex; align-items: center; gap: 12px;
+        font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--accent); margin-bottom: 14px;
+      }
+      .kicker .num { color: #5f656e; letter-spacing: 0.12em; }
+
+      .reel h2 {
+        font-size: clamp(30px, 4vw, 46px);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .reel[data-film="litel"] h2 { color: var(--yellow); }
+
+      .reel .lede { margin-top: 16px; font-size: 15px; line-height: 1.6; color: #b1b8c1; max-width: 56ch; }
+      .reel .lede b { color: var(--text); font-weight: 600; }
+
+      .chapters { margin-top: 24px; }
+
+      .section-title {
+        display: flex; justify-content: space-between;
+        font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+        color: #7c828b; margin-bottom: 8px;
+      }
+
+      .chapter {
+        width: 100%; display: flex; align-items: center; gap: 12px;
+        background: transparent; border: 0; border-top: 1px solid var(--line);
+        color: inherit; text-align: left; padding: 10px 2px; cursor: pointer;
+        transition: background .18s, padding-left .18s;
+      }
+      .chapter:last-of-type { border-bottom: 1px solid var(--line); }
+      .chapter:hover { background: rgba(255, 255, 255, 0.035); padding-left: 8px; }
+      .chapter time { font-variant-numeric: tabular-nums; font-size: 11px; color: var(--accent); width: 42px; flex: none; }
+      .chapter .txt { display: flex; flex-direction: column; gap: 1px; }
+      .chapter .t { font-size: 13px; font-weight: 600; }
+      .chapter .d { font-size: 11px; color: var(--muted); }
+      .chapter .n { margin-left: auto; font-size: 10px; color: #5f656e; }
+
+      .actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 22px; }
+
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        border-radius: 999px; padding: 11px 18px;
+        font-size: 12px; font-weight: 600; text-decoration: none;
+        border: 1px solid var(--line); color: var(--text);
+        transition: transform .18s, background .18s, border-color .18s;
+      }
+      .btn:hover { transform: translateY(-1px); }
+      .btn.primary { background: var(--accent); color: #0a0b0d; border-color: transparent; }
+      .reel[data-film="litel"] .btn.primary { background: var(--yellow); color: #0a2a5e; }
+      .btn.ghost:hover { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.04); }
+
+      footer {
+        margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
+        display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+        font-size: 12px; color: #6f757e;
+      }
+
+      @media (max-width: 880px) {
+        .reel, .reel.flip { grid-template-columns: 1fr; gap: 30px; }
+        .reel.flip .stage-wrap { order: 0; }
+        .reel.flip .info { order: 1; }
+        .stage-wrap { max-width: 400px; margin: 0 auto; width: 100%; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="/">
+          <span class="mark">I</span>
+          <span class="brand-text"><b>ISTAN PROJECTS</b><span>FILMS</span></span>
+        </a>
+        <a class="back" href="/">← Tous les projets</a>
+      </header>
+
+      <div class="hero">
+        <div class="eyebrow"><i></i> Salle de projection</div>
+        <h1>Tous les films.<br /><em>Au même endroit.</em></h1>
+        <p>
+          Le film du portail et la campagne <b>Litel</b>, en 9:16, avec voix off française,
+          musique originale et sous-titres. Chaque chapitre se lance directement dans son lecteur.
+        </p>
+      </div>
+
+      <!-- Film 1 -->
+      <section class="reel" id="istan" data-film="istan">
+        <div class="stage-wrap">
+          <div class="stage">
+            <video
+              id="film-istan"
+              controls
+              playsinline
+              preload="metadata"
+              poster="media/istan-poster.jpg"
+              data-player
+            >
+              <source src="media/istan-projects.mp4" type="video/mp4" />
+              <track kind="subtitles" srclang="fr" label="Français" src="media/istan-projects.vtt" default />
+              Votre navigateur ne lit pas la vidéo.
+            </video>
+          </div>
+          <div class="meta">
+            <span class="pill"><b>1:10</b> · 9:16</span>
+            <span class="pill"><b>1080×1920</b> · 30 fps</span>
+            <span class="pill">voix <b>FR</b></span>
+          </div>
+        </div>
+
+        <div class="info">
+          <div class="kicker"><span>01</span><span class="num">— ISTAN PROJECTS</span></div>
+          <h2>Un serveur.<br />Tous tes projets.</h2>
+          <p class="lede">
+            Le portail en un peu plus d’une minute : <b>Creator</b> pour les compositions,
+            <b>Publisher</b> pour Discord, <b>Mercato Analyser</b> pour les transferts et
+            <b>MipMap</b> pour le monde Minecraft. Une adresse, quatre outils, une seule commande.
+          </p>
+
+          <div class="chapters" data-for="film-istan">
+            <div class="section-title"><span>Chapitres</span><span>cliquez pour lire</span></div>
+            <button class="chapter" data-at="0"><time>00:00</time><span class="txt"><span class="t">Ouverture</span><span class="d">Un serveur, tous tes projets</span></span><span class="n">01</span></button>
+            <button class="chapter" data-at="7"><time>00:07</time><span class="txt"><span class="t">Le portail</span><span class="d">Une adresse, quatre applications</span></span><span class="n">02</span></button>
+            <button class="chapter" data-at="15.5"><time>00:15</time><span class="txt"><span class="t">Creator</span><span class="d">Composer, gérer, exporter</span></span><span class="n">03</span></button>
+            <button class="chapter" data-at="26.5"><time>00:26</time><span class="txt"><span class="t">Publisher</span><span class="d">Discord sous ton identité</span></span><span class="n">04</span></button>
+            <button class="chapter" data-at="37.5"><time>00:37</time><span class="txt"><span class="t">Mercato Analyser</span><span class="d">341 messages, 48 transferts</span></span><span class="n">05</span></button>
+            <button class="chapter" data-at="50.5"><time>00:50</time><span class="txt"><span class="t">MipMap</span><span class="d">Le monde Minecraft en direct</span></span><span class="n">06</span></button>
+            <button class="chapter" data-at="60.5"><time>01:00</time><span class="txt"><span class="t">Sortie</span><span class="d">node start.js</span></span><span class="n">07</span></button>
+          </div>
+
+          <div class="actions">
+            <a class="btn primary" href="media/istan-projects.mp4" download>Télécharger le MP4</a>
+            <a class="btn ghost" href="media/istan-projects.vtt" download>Sous-titres .vtt</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Film 2 -->
+      <section class="reel flip" id="litel" data-film="litel">
+        <div class="stage-wrap">
+          <div class="stage">
+            <video
+              id="film-litel"
+              controls
+              playsinline
+              preload="metadata"
+              poster="media/litel-poster.jpg"
+              data-player
+            >
+              <source src="media/litel.mp4" type="video/mp4" />
+              <track kind="subtitles" srclang="fr" label="Français" src="media/litel.vtt" default />
+              Votre navigateur ne lit pas la vidéo.
+            </video>
+          </div>
+          <div class="meta">
+            <span class="pill"><b>0:35</b> · 9:16</span>
+            <span class="pill"><b>1080×1920</b> · 30 fps</span>
+            <span class="pill">voix <b>FR</b></span>
+          </div>
+        </div>
+
+        <div class="info">
+          <div class="kicker"><span>02</span><span class="num">— LITEL</span></div>
+          <h2>Des petits prix.<br />Partout.</h2>
+          <p class="lede">
+            Dix-neuf heures quatre, tu sors du boulot, et l’enseigne est au bout de la rue.
+            <b>Litel</b> est présent dans tous les Istanmusta : douze mille produits, un nouveau
+            rayon chaque semaine et des promos qui changent tous les mardis.
+          </p>
+
+          <div class="chapters" data-for="film-litel">
+            <div class="section-title"><span>Chapitres</span><span>cliquez pour lire</span></div>
+            <button class="chapter" data-at="0"><time>00:00</time><span class="txt"><span class="t">La rue</span><span class="d">19:04, quartier Nord</span></span><span class="n">01</span></button>
+            <button class="chapter" data-at="7.5"><time>00:07</time><span class="txt"><span class="t">La façade</span><span class="d">Les portes s’ouvrent</span></span><span class="n">02</span></button>
+            <button class="chapter" data-at="12.5"><time>00:12</time><span class="txt"><span class="t">Les prix</span><span class="d">Le panier à moins de dix</span></span><span class="n">03</span></button>
+            <button class="chapter" data-at="20.5"><time>00:20</time><span class="txt"><span class="t">Les rayons</span><span class="d">12 000 produits, promos du mardi</span></span><span class="n">04</span></button>
+            <button class="chapter" data-at="28.5"><time>00:28</time><span class="txt"><span class="t">Partout</span><span class="d">En Istanmusta, au bout de ta rue</span></span><span class="n">05</span></button>
+          </div>
+
+          <div class="actions">
+            <a class="btn primary" href="media/litel.mp4" download>Télécharger le MP4</a>
+            <a class="btn ghost" href="media/litel.vtt" download>Sous-titres .vtt</a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>Deux films 1080×1920 · voix off française · musique originale.</span>
+        <span>Compositions HTML rendues avec HyperFrames — sources dans <code>video/</code> et <code>litel-video/</code>.</span>
+      </footer>
+    </div>
+
+    <script>
+      const players = Array.from(document.querySelectorAll("[data-player]"));
+
+      players.forEach((player) => {
+        player.addEventListener("play", () => {
+          players.forEach((other) => {
+            if (other !== player) other.pause();
+          });
+        });
+      });
+
+      document.querySelectorAll(".chapters").forEach((group) => {
+        const player = document.getElementById(group.dataset.for);
+        group.querySelectorAll(".chapter").forEach((button) => {
+          button.addEventListener("click", () => {
+            player.currentTime = Number(button.dataset.at) + 0.02;
+            player.play().catch(() => {});
+            player.scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

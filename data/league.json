@@ -1,0 +1,99 @@
+{
+  "clubs": [
+    {
+      "id": "club-d9prvkhp",
+      "name": "Hh",
+      "shortName": "HHH",
+      "city": "",
+      "country": "ISTANMUSTA",
+      "sport": "football",
+      "primaryColor": "#c8ff3d",
+      "secondaryColor": "#0b0c0f",
+      "ratingMode": "classic",
+      "rating": {
+        "overall": 59,
+        "attack": 75,
+        "midfield": 75,
+        "defense": 75
+      }
+    },
+    {
+      "id": "club-uhm6kfkm",
+      "name": "TEST",
+      "shortName": "TST",
+      "city": "",
+      "country": "ISTANMUSTA",
+      "sport": "football",
+      "logo": "/api/uploads/1792256977016-3a693584.png",
+      "primaryColor": "#c8ff3d",
+      "secondaryColor": "#0b0c0f",
+      "ratingMode": "classic",
+      "rating": {
+        "overall": 82,
+        "attack": 75,
+        "midfield": 75,
+        "defense": 75
+      }
+    }
+  ],
+  "competitions": [
+    {
+      "id": "comp-68apqdlf",
+      "name": "D1",
+      "sport": "football",
+      "format": "league",
+      "settings": {
+        "pointsWin": 3,
+        "pointsDraw": 1,
+        "pointsLoss": 0,
+        "doubleRound": true,
+        "legs": 1,
+        "extraTime": true,
+        "penalties": true,
+        "groupCount": 2,
+        "teamsPerGroup": 4,
+        "qualifyPerGroup": 2,
+        "seed": 20261017,
+        "homeAdvantage": 0.83
+      },
+      "clubIds": [
+        "club-d9prvkhp",
+        "club-uhm6kfkm"
+      ],
+      "fixtures": [
+        {
+          "id": "l-0",
+          "stage": "Journée 1",
+          "round": 1,
+          "homeId": "club-d9prvkhp",
+          "awayId": "club-uhm6kfkm",
+          "leg": 1,
+          "played": true,
+          "homeScore": 2,
+          "awayScore": 1,
+          "homePens": null,
+          "awayPens": null,
+          "extraTime": false,
+          "events": []
+        },
+        {
+          "id": "l-1",
+          "stage": "Journée 2",
+          "round": 2,
+          "homeId": "club-uhm6kfkm",
+          "awayId": "club-d9prvkhp",
+          "leg": 1,
+          "played": false,
+          "homeScore": null,
+          "awayScore": null,
+          "homePens": null,
+          "awayPens": null,
+          "extraTime": false,
+          "events": []
+        }
+      ],
+      "createdAt": 1792257068728,
+      "updatedAt": 1792257140545
+    }
+  ]
+}

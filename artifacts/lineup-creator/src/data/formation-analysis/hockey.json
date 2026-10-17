@@ -1,0 +1,17 @@
+{
+  "sport": "hockey",
+  "version": 1,
+  "description": "Référentiel des postes utilisé par l'analyseur de formations hockey.",
+  "roles": {
+    "goalkeeper": ["G", "GB", "GK", "GOALIE", "GARDIEN"],
+    "defender": ["D", "DG", "DD", "LD", "RD", "DEF", "DEFENDER", "DEFENSEUR", "DEFENSE"],
+    "center": ["C", "CENTER", "CENTRE", "CENTRE ICE"],
+    "wing": ["AG", "AD", "LW", "RW", "LEFT WING", "RIGHT WING", "AILIER GAUCHE", "AILIER DROIT"],
+    "forward": ["F", "ATT", "ATTAQUANT", "FORWARD", "BU", "MOC", "SS", "ATTACKER"]
+  },
+  "slotRules": {
+    "DG_DD": "Le côté du défenseur est conservé quand il est disponible.",
+    "AG_AD": "Le côté de l'ailier est conservé quand il est disponible.",
+    "C": "Un centre est prioritaire; un attaquant polyvalent est une solution de repli."
+  }
+}

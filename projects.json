@@ -1,0 +1,143 @@
+{
+  "portal": {
+    "name": "ISTAN",
+    "nameAccent": "PROJECTS",
+    "tagline": "Un serveur · tous vos projets",
+    "title": "Accueil — ISTAN Projects",
+    "eyebrow": "Votre espace de projets",
+    "heroTitle": "Vos projets.",
+    "heroAccent": "Un seul accès.",
+    "heroLead": "Choisissez une application pour commencer. Pour en ajouter une, déclarez simplement un projet dans projects.json : pages, fichiers statiques, redirections et API y sont décrits au même endroit.",
+    "note": "Un seul serveur à démarrer : node start.js. Ajouter un projet = une entrée dans projects.json.",
+    "footer": "Node.js · Un point d’entrée pour vos applications."
+  },
+  "projects": [
+    {
+      "id": "creator",
+      "title": "ISTAN CREATOR",
+      "category": "Composition & gestion d’équipes",
+      "description": "Créez vos compositions football et hockey, gérez les clubs et exportez vos visuels.",
+      "href": "/creator/",
+      "icon": "⚽",
+      "accent": "green",
+      "static": [
+        {
+          "prefix": "/creator",
+          "root": "artifacts/lineup-creator/dist/public",
+          "fallback": true
+        }
+      ],
+      "api": {
+        "prefix": "/api",
+        "portEnv": "API_PORT"
+      }
+    },
+    {
+      "id": "publisher",
+      "title": "DISCORD PUBLISHER",
+      "category": "Publication & modération Discord",
+      "description": "Composez vos messages avec l'identité de vos profils, suivez le salon Discord en direct et journalisez les mutes et bans RP.",
+      "href": "/publisher/",
+      "icon": "✉",
+      "accent": "blurple",
+      "static": [
+        {
+          "prefix": "/publisher",
+          "root": "artifacts/discord-publisher/public"
+        }
+      ],
+      "redirects": [
+        { "paths": ["/publisher"], "location": "/publisher/" }
+      ]
+    },
+    {
+      "id": "mercato",
+      "title": "MERCATO ANALYSER",
+      "category": "Analyse des transferts",
+      "description": "Relisez quatre mois de messages du salon mercato et obtenez la liste des transferts individuels annoncés, avec montants et sources.",
+      "href": "/mercato/",
+      "icon": "⇄",
+      "accent": "lime",
+      "static": [
+        {
+          "prefix": "/mercato",
+          "root": "artifacts/mercato/public"
+        }
+      ],
+      "redirects": [
+        { "paths": ["/mercato"], "location": "/mercato/" }
+      ]
+    },
+    {
+      "id": "leaguemanager",
+      "title": "LEAGUEMANAGER",
+      "category": "Compétitions & simulation",
+      "description": "Ligues, coupes et formats personnalisés : clubs avec logo, généralité classique ou par compartiment (défense, milieu, attaque), calendrier tiré au sort, simulation locale sans IA externe et export PNG des classements et résultats.",
+      "href": "/leaguemanager/",
+      "icon": "🏆",
+      "accent": "amber",
+      "static": [
+        {
+          "prefix": "/leaguemanager",
+          "root": "artifacts/leaguemanager/dist/public",
+          "fallback": true
+        }
+      ]
+    },
+    {
+      "id": "minecraft-map",
+      "title": "Webmap MipMap",
+      "category": "Carte du serveur Minecraft",
+      "description": "Explorez le monde, affichez le relief, les chunks et les joueurs connectés.",
+      "href": "/map",
+      "icon": "⌖",
+      "accent": "cyan",
+      "static": [
+        {
+          "prefix": "/map/",
+          "root": "artifacts/lineup-creator/dist/public/map-assets"
+        },
+        {
+          "prefix": "/map3d/",
+          "root": "artifacts/lineup-creator/dist/public/map-assets"
+        },
+        {
+          "prefix": "/mipmap-assets/",
+          "root": "artifacts/lineup-creator/dist/public/mipmap-assets"
+        }
+      ],
+      "redirects": [
+        { "paths": ["/map", "/map/"], "location": "/mipmap.html" },
+        { "paths": ["/map3d", "/map3d/"], "location": "/map3d.html" }
+      ],
+      "api": {
+        "prefix": "/api/map/",
+        "portEnv": "MAP_SERVER_PORT",
+        "map": {
+          "mipmapPrefix": "/api/map/mipmap/",
+          "postRoutes": ["/api/chunks-data", "/api/players-data"],
+          "getRoutes": ["status", "players", "config", "meta", "relief", "tile", "tiles", "chunk", "chunks"]
+        }
+      }
+    },
+    {
+      "id": "films",
+      "title": "FILMS",
+      "category": "Salle de projection",
+      "description": "Tous les films au même endroit : le film du portail ISTAN et la campagne Litel, en 9:16, avec chapitres et sous-titres.",
+      "href": "/films/",
+      "icon": "▶",
+      "accent": "lime",
+      "static": [
+        {
+          "prefix": "/films",
+          "root": "artifacts/films/public"
+        }
+      ],
+      "redirects": [
+        { "paths": ["/film", "/film/"], "location": "/films/#istan" },
+        { "paths": ["/litel", "/litel/"], "location": "/films/#litel" }
+      ]
+    }
+  ]
+}

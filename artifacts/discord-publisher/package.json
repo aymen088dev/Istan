@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/discord-publisher",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bot de relais Discord et interface de publication ISTAN",
+  "scripts": {
+    "start": "node ./bot.js",
+    "import-data": "node ./import-data.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.21.0"
+  }
+}

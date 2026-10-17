@@ -1,0 +1,34 @@
+# ---------------------------------------------------------------------------
+# pyproject.toml  ==  plugin MipMap (fork Endstone 0.11)
+#
+# Amont : github.com/MipaSenpai/MipMap (MIT, voir LICENSE).
+# Seule difference : le plugin est porte sur l'API Endstone 0.11 et la
+# configuration par defaut vise le mapserver de ce depot.
+# ---------------------------------------------------------------------------
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "endstone-mipmap"
+version = "1.0.4"
+dependencies = ["aiohttp>=3.13.0"]
+
+authors = [
+    { name = "Mipa" },
+    { name = "Bebrowskiy" },
+]
+description = "MipMap - Interactive Online Map for Endstone (port 0.11)"
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["endstone", "plugin", "online-map"]
+
+[project.urls]
+Homepage = "https://github.com/MipaSenpai/MipMap"
+
+[project.entry-points."endstone"]
+mipmap = "endstone_mipmap:Map"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/endstone_mipmap"]

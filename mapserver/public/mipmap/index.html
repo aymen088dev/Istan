@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MipMap — Minecraft Map Viewer</title>
+    <link rel="icon" type="image/svg+xml" href="/static/assets/favicon.svg">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div id="map"></div>
+
+    <div class="logo">
+        <img src="/static/assets/icon.svg" alt="MipMap" width="30" height="30" class="logo-icon">
+        <span>MipMap</span>
+    </div>
+
+    <div class="coords" id="coords">x: 0, z: 0</div>
+
+    <div class="world-selector" id="worldSelector">
+        <button class="world-btn active" data-world="Overworld">Overworld</button>
+        <button class="world-btn" data-world="Nether">Nether</button>
+        <button class="world-btn" data-world="TheEnd">End</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="static/js/map.js"></script>
+</body>
+</html>

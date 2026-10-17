@@ -1,0 +1,20 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node ./start.js",
+    "preinstall": "node -e \"if (!(process.env.npm_config_user_agent || '').startsWith('pnpm/')) console.warn('Pterodactyl/npm detected; start.js will bootstrap pnpm for the workspace.')\"",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
+    "test:mipmap": "python3 ./artifacts/endstone-mipmap/test_pipeline.py",
+    "build:mipmap": "sh ./artifacts/endstone-mipmap/build.sh",
+    "start": "node ./start.js"
+  },
+  "private": true,
+  "devDependencies": {
+    "typescript": "~5.9.2",
+    "prettier": "^3.8.1"
+  }
+}

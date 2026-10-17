@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Lineup Creator"
+version = "1.0.0"
+id = "artifacts/lineup-creator"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24836
+
+[services.development]
+run = "pnpm --filter @workspace/lineup-creator run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lineup-creator", "run", "build" ]
+publicDir = "artifacts/lineup-creator/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24836"
+BASE_PATH = "/"

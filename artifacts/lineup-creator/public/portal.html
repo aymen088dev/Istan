@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1010">
+  <title>Accueil — ISTAN PROJECTS</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0a1010;--panel:#111b19;--line:#273b34;--muted:#a4b3ac;--text:#f3f7f4;--green:#a7ed6f;--cyan:#73d9d1;--blurple:#8f9cff;font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 16% 0%,#19332b 0,transparent 35%),radial-gradient(ellipse at 92% 78%,#123439 0,transparent 34%),var(--bg);color:var(--text)}
+    main{width:min(1020px,calc(100% - 36px));margin:auto;padding:54px 0 70px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:.78rem;font-weight:850;letter-spacing:.16em}.brand b{color:var(--green)}.port{border:1px solid var(--line);border-radius:999px;padding:7px 12px;color:var(--muted);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}.port i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #a7ed6f88}
+    .hero{max-width:700px;padding:90px 0 50px}.eyebrow{color:var(--green);font-size:.76rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.hero h1{margin:15px 0;font-size:clamp(2.8rem,8vw,5.7rem);line-height:.98;letter-spacing:-.065em}.hero h1 .accent{color:var(--green)}.hero p{max-width:570px;color:var(--muted);font-size:1.06rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}.card{position:relative;min-height:330px;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;padding:28px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(150deg,#16231f,#101816 76%);text-decoration:none;color:inherit;transition:transform .2s,border-color .2s,box-shadow .2s}.card:hover{transform:translateY(-4px);border-color:#78916f;box-shadow:0 20px 60px #0005}.card[data-accent="cyan"]{background:linear-gradient(150deg,#142627,#101819 76%)}.card[data-accent="blurple"]{background:linear-gradient(150deg,#1c2144,#111420 76%)}.card[data-accent="lime"]{background:linear-gradient(150deg,#1d2618,#101511 76%)}.icon{width:50px;height:50px;display:grid;place-items:center;border:1px solid #40583c;border-radius:15px;background:#9fe66e12;color:var(--green);font-size:1.5rem}.card[data-accent="cyan"] .icon{border-color:#2c5555;background:#73d9d112;color:var(--cyan)}.card[data-accent="blurple"] .icon{border-color:#3d4899;background:#5865f21f;color:var(--blurple)}.card[data-accent="lime"] .icon{border-color:#54663a;background:#d8f36a12;color:#d8f36a}.label{margin:27px 0 7px;color:var(--muted);font-size:.72rem;font-weight:750;letter-spacing:.16em;text-transform:uppercase}.card h2{margin:0;font-size:1.75rem;letter-spacing:-.04em}.card p{max-width:390px;margin:11px 0 25px;color:var(--muted);font-size:.93rem}.go{margin-top:auto;display:flex;align-items:center;gap:9px;font-size:.88rem;font-weight:750;color:var(--green)}.card[data-accent="cyan"] .go{color:var(--cyan)}.card[data-accent="blurple"] .go{color:var(--blurple)}.card[data-accent="lime"] .go{color:#d8f36a}.arrow{font-size:1.2rem;transition:transform .2s}.card:hover .arrow{transform:translateX(5px)}
+    .empty{grid-column:1/-1;padding:30px;border:1px dashed var(--line);border-radius:18px;color:var(--muted);text-align:center}
+    .note{margin-top:24px;padding:16px 18px;border:1px solid var(--line);border-radius:15px;color:var(--muted);font-size:.84rem}.note strong{color:var(--text)}footer{margin-top:46px;color:#74847b;font-size:.76rem}
+    @media(max-width:680px){main{padding-top:30px}.hero{padding:68px 0 34px}.grid{grid-template-columns:1fr}.card{min-height:285px;padding:24px}.hero p{font-size:1rem}}
+    /* Accent ambre — réservé aux compétitions (LeagueManager). */
+    .card[data-accent="amber"]{background:linear-gradient(150deg,#2b2413,#171410 76%)}
+    .card[data-accent="amber"] .icon{border-color:#6f5c28;background:#ffd4001f;color:#ffd400}
+    .card[data-accent="amber"] .go{color:#ffd400}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top"><div class="brand"><span id="brand-name">ISTAN</span> <b id="brand-accent">PROJECTS</b></div><div class="port"><i></i><span id="tagline">Un serveur · tous vos projets</span></div></header>
+    <section class="hero"><div class="eyebrow" id="eyebrow">Votre espace de projets</div><h1><span id="hero-title">Vos projets.</span><br><span class="accent" id="hero-accent">Un seul accès.</span></h1><p id="hero-lead">Choisissez une application pour commencer.</p></section>
+    <nav class="grid" id="projects" aria-label="Choisir un projet" aria-live="polite"><div class="empty">Chargement des projets…</div></nav>
+    <div class="note"><strong>Un seul serveur à démarrer :</strong> <span id="note">Ajouter un projet = une entrée dans <code>projects.json</code>.</span></div>
+    <footer id="footer">Node.js · Un point d’entrée pour vos applications.</footer>
+  </main>
+  <script>
+    const grid = document.querySelector("#projects");
+    const setText = (id, value) => {
+      if (value === undefined || value === null || value === "") return;
+      const element = document.getElementById(id);
+      if (element) element.textContent = String(value);
+    };
+
+    function renderProjects(projects) {
+      if (!projects.length) {
+        grid.innerHTML = '<div class="empty">Aucun projet configuré. Ajoutez-en dans <code>projects.json</code>.</div>';
+        return;
+      }
+      grid.replaceChildren(...projects.map(project => {
+        const card = document.createElement("a");
+        card.className = "card";
+        card.href = project.href;
+        card.dataset.accent = project.accent || "green";
+        const icon = document.createElement("div");
+        icon.className = "icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = project.icon || "✦";
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = project.category || "Projet";
+        const title = document.createElement("h2");
+        title.textContent = project.title;
+        const description = document.createElement("p");
+        description.textContent = project.description || "";
+        const action = document.createElement("span");
+        action.className = "go";
+        action.append(document.createTextNode(`Ouvrir ${project.title} `));
+        const arrow = document.createElement("span");
+        arrow.className = "arrow";
+        arrow.textContent = "→";
+        action.append(arrow);
+        card.append(icon, label, title, description, action);
+        return card;
+      }));
+    }
+
+    fetch("/projects.json").then(response => {
+      if (!response.ok) throw new Error("Configuration indisponible");
+      return response.json();
+    }).then(({ portal = {}, projects = [] }) => {
+      // Tout l'habillage du portail vient de projects.json : changer de projet
+      // ou de texte ne demande aucune modification de cette page.
+      if (portal.title) document.title = portal.title;
+      setText("brand-name", portal.name);
+      setText("brand-accent", portal.nameAccent);
+      setText("tagline", portal.tagline);
+      setText("eyebrow", portal.eyebrow);
+      setText("hero-title", portal.heroTitle);
+      setText("hero-accent", portal.heroAccent);
+      setText("hero-lead", portal.heroLead);
+      setText("note", portal.note);
+      setText("footer", portal.footer);
+      renderProjects(projects);
+    }).catch(() => {
+      grid.innerHTML = '<div class="empty">Impossible de charger les projets. Vérifiez <code>projects.json</code>.</div>';
+    });
+  </script>
+</body>
+</html>

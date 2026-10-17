@@ -1,0 +1,15 @@
+{
+  "name": "litel-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.8.168 preview",
+    "check": "npx --yes hyperframes@0.8.168 check",
+    "score": "node tools/score.mjs",
+    "sfx": "node tools/sfx.mjs",
+    "voice": "node tools/voice.mjs",
+    "render": "HF_SEGMENTED_CAPTURE=true HF_SEGMENT_FRAMES=600 npx --yes hyperframes@0.8.168 render -q looks --resume -o renders/litel.mp4",
+    "render:fresh": "HF_SEGMENTED_CAPTURE=true HF_SEGMENT_FRAMES=600 npx --yes hyperframes@0.8.168 render -q looks -o renders/litel.mp4",
+    "publish": "npx --yes hyperframes@0.8.168 publish"
+  }
+}

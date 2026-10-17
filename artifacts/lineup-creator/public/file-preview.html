@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101916">
+  <title>Aperçu de fichier · ISTAN CREATOR</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101916;--panel:#19231f;--line:#314139;--muted:#a1b1a7;--text:#f2f6f2;--accent:#b9f27c;--warn:#ffbd8b;font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#293b2c 0,transparent 58%),var(--bg);color:var(--text)}
+    main{width:min(900px,calc(100% - 36px));margin:0 auto;padding:42px 0 72px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:48px}.brand{color:var(--text);text-decoration:none;font-size:.78rem;font-weight:850;letter-spacing:.16em}.brand span{color:var(--accent)}.back{color:var(--muted);text-decoration:none;font-size:.88rem}.back:hover{color:var(--accent)}
+    .eyebrow{color:var(--accent);font-size:.78rem;font-weight:750;letter-spacing:.16em;text-transform:uppercase}h1{margin:12px 0 10px;font-size:clamp(2.1rem,6vw,3.7rem);letter-spacing:-.055em;line-height:1.05}.intro{max-width:610px;color:var(--muted);margin:0 0 27px}
+    .privacy{display:flex;gap:12px;align-items:flex-start;margin:0 0 20px;padding:14px 16px;border:1px solid #3b523d;border-radius:14px;background:#1a2a20;color:#d7e9d4;font-size:.9rem}.privacy-mark{color:var(--accent);font-size:1.1rem}
+    .drop{min-height:220px;display:grid;place-content:center;justify-items:center;gap:9px;padding:26px;border:1px dashed #617465;border-radius:20px;background:linear-gradient(145deg,#1a2520,#151d19);text-align:center;cursor:pointer;transition:border-color .18s,background .18s,transform .18s}.drop:hover,.drop:focus-visible,.drop.over{outline:none;border-color:var(--accent);background:#202d23;transform:translateY(-1px)}.drop-icon{font-size:2rem;color:var(--accent)}.drop strong{font-size:1.1rem}.drop small{color:var(--muted)}
+    .notice{min-height:1.6em;margin:12px 3px;color:var(--warn);font-size:.9rem}.card{overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--panel)}.filebar{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:17px 20px;border-bottom:1px solid var(--line)}.filename{min-width:0}.filename strong{display:block;overflow-wrap:anywhere}.filename small{color:var(--muted)}a{color:var(--accent)}.download{flex:none;padding:8px 12px;border:1px solid #52634f;border-radius:10px;text-decoration:none;font-size:.88rem}.download:hover{background:#26342a}
+    .preview{min-height:190px;display:grid;place-items:center;padding:18px}.placeholder{color:var(--muted);text-align:center}.preview img{display:block;max-width:100%;max-height:68vh;object-fit:contain;border-radius:8px}.preview iframe{width:100%;height:68vh;border:0;border-radius:8px;background:#fff}.preview video{max-width:100%;max-height:68vh}.preview audio{width:min(100%,560px)}pre{width:100%;max-height:68vh;overflow:auto;margin:0;padding:18px;border-radius:10px;background:#101613;color:#e1ebdf;font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.foot{margin-top:17px;color:var(--muted);font-size:.82rem}[hidden]{display:none!important}
+    @media(max-width:560px){main{padding-top:28px}.top{margin-bottom:34px}.filebar{align-items:flex-start;flex-direction:column}.drop{min-height:190px}.preview{padding:10px}}
+  </style>
+</head>
+<body>
+  <main>
+    <nav class="top" aria-label="Navigation"><a class="brand" href="/">ISTAN <span>CREATOR</span></a><a class="back" href="/">← Retour à l’application</a></nav>
+    <div class="eyebrow">Aperçu de fichier · jusqu’à 100 Mo</div>
+    <h1>Choisissez votre fichier.</h1>
+    <p class="intro">Vous pouvez ouvrir tous les formats. Les images, PDF, fichiers audio/vidéo et textes courants s’affichent ici ; les autres restent disponibles au téléchargement.</p>
+    <div class="privacy"><span class="privacy-mark" aria-hidden="true">●</span><div><strong>Aperçu privé et local.</strong> Le fichier reste dans votre navigateur, sans téléversement vers le serveur ou la conversation.</div></div>
+    <input id="file-input" type="file" hidden>
+    <div id="drop-zone" class="drop" role="button" tabindex="0" aria-label="Choisir ou déposer un fichier">
+      <div class="drop-icon" aria-hidden="true">＋</div><strong>Déposez votre fichier ici</strong><small>ou cliquez pour parcourir vos fichiers · tout format · 100 Mo maximum</small>
+    </div>
+    <p id="notice" class="notice" role="status" aria-live="polite"></p>
+    <section id="file-card" class="card" hidden aria-label="Aperçu du fichier">
+      <div class="filebar"><div class="filename"><strong id="file-name"></strong><small id="file-info"></small></div><a id="download" class="download" download>Télécharger</a></div>
+      <div id="preview" class="preview"></div>
+    </section>
+    <p class="foot">Pour les fichiers texte volumineux, seuls les premiers 1 Mo sont affichés afin de garder l’aperçu réactif. Les autres formats sont sélectionnables, mais leur affichage dépend du navigateur.</p>
+  </main>
+  <script>
+    (() => {
+      const MAX_BYTES = 100 * 1024 * 1024;
+      const TEXT_PREVIEW_BYTES = 1024 * 1024;
+      const TEXT_EXTENSIONS = new Set(["txt","md","markdown","csv","tsv","json","jsonl","xml","yaml","yml","toml","log","ini","conf","html","htm","css","js","jsx","ts","tsx","py","rb","go","rs","java","c","h","cpp","sh","sql"]);
+      const input = document.getElementById("file-input");
+      const zone = document.getElementById("drop-zone");
+      const notice = document.getElementById("notice");
+      const card = document.getElementById("file-card");
+      const preview = document.getElementById("preview");
+      const download = document.getElementById("download");
+      let objectUrl = "";
+      let selectionId = 0;
+
+      function reset() {
+        selectionId++;
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        objectUrl = "";
+        card.hidden = true;
+        preview.replaceChildren();
+        notice.textContent = "";
+      }
+      function make(tag, attributes = {}) {
+        const element = document.createElement(tag);
+        for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+        return element;
+      }
+      function makePlaceholder(message) {
+        const element = make("div", { class: "placeholder" });
+        element.textContent = message;
+        return element;
+      }
+      function prettySize(bytes) {
+        if (bytes < 1024) return `${bytes} o`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+      }
+      async function showFile(file) {
+        if (!file) return;
+        reset();
+        if (file.size > MAX_BYTES) {
+          notice.textContent = `Fichier trop volumineux (${prettySize(file.size)}). La limite est de 100 Mo.`;
+          return;
+        }
+        const currentSelection = selectionId;
+        document.getElementById("file-name").textContent = file.name;
+        document.getElementById("file-info").textContent = `${prettySize(file.size)}${file.type ? ` · ${file.type}` : " · type inconnu"}`;
+        objectUrl = URL.createObjectURL(file);
+        download.href = objectUrl;
+        download.download = file.name;
+        card.hidden = false;
+        preview.replaceChildren();
+
+        if (file.type.startsWith("image/")) {
+          const image = make("img", { src: objectUrl, alt: `Aperçu de ${file.name}` });
+          image.onerror = () => { preview.replaceChildren(makePlaceholder("Impossible d’afficher cette image dans le navigateur.")); };
+          preview.append(image);
+        } else if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+          preview.append(make("iframe", { src: objectUrl, title: `Aperçu PDF de ${file.name}` }));
+        } else if (file.type.startsWith("video/")) {
+          preview.append(make("video", { src: objectUrl, controls: "", preload: "metadata" }));
+        } else if (file.type.startsWith("audio/")) {
+          preview.append(make("audio", { src: objectUrl, controls: "", preload: "metadata" }));
+        } else {
+          const extension = file.name.includes(".") ? file.name.split(".").pop().toLowerCase() : "";
+          const isText = file.type.startsWith("text/") || TEXT_EXTENSIONS.has(extension) || /json|xml|javascript|typescript|yaml/.test(file.type);
+          if (!isText) {
+            preview.append(makePlaceholder("Aperçu intégré indisponible pour ce format. Le fichier reste sélectionné et peut être téléchargé."));
+            return;
+          }
+          try {
+            const truncated = file.size > TEXT_PREVIEW_BYTES;
+            const text = await file.slice(0, TEXT_PREVIEW_BYTES).text();
+            if (currentSelection !== selectionId) return;
+            const pre = make("pre");
+            pre.textContent = text + (truncated ? "\n\n… Aperçu limité aux premiers 1 Mo du fichier." : "");
+            preview.append(pre);
+          } catch {
+            if (currentSelection === selectionId) preview.append(makePlaceholder("La lecture de ce fichier a échoué."));
+          }
+        }
+      }
+
+      zone.addEventListener("click", () => input.click());
+      zone.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); input.click(); }
+      });
+      input.addEventListener("change", () => { void showFile(input.files[0]); input.value = ""; });
+      for (const eventName of ["dragenter", "dragover"]) zone.addEventListener(eventName, event => { event.preventDefault(); zone.classList.add("over"); });
+      for (const eventName of ["dragleave", "drop"]) zone.addEventListener(eventName, event => { event.preventDefault(); zone.classList.remove("over"); });
+      zone.addEventListener("drop", event => { void showFile(event.dataTransfer.files[0]); });
+      window.addEventListener("beforeunload", () => { if (objectUrl) URL.revokeObjectURL(objectUrl); });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+# Settings MipMap (fork Endstone 0.11)
+
+# Display players on the map
+sendPlayers = true
+
+# Le portail (start.js) expose la carte sur son port public, sous le
+# prefixe /api/map/ declare dans projects.json (mapApi.prefix). Ces deux
+# routes sont relayees au mapserver, qui garde le protocole natif :
+#   POST /api/chunks-data   et   POST /api/players-data
+# Adresse publique du portail renseignee ci-dessous : 151.240.30.10:10005.
+# C'est LE point a adapter si l'allocation publique change sur l'hebergeur
+# (PORT) : les deux URLs ci-dessous doivent viser cette allocation.
+# Cote serveur, les chunks sont conserves dans data/chunks.ndjson
+# (deplacable avec MAP_DATA_FILE) : c'est le "chemin data" du portail.
+# Si MAP_MIPMAP_TOKEN est defini, ajouter ?key=<TOKEN> aux deux URLs :
+# le plugin n'envoie pas d'en-tete d'authentification.
+[api]
+chunks = "http://151.240.30.10:10005/api/map/chunks-data"
+players = "http://151.240.30.10:10005/api/map/players-data"
+
+# Warning: modify only if you understand the consequences
+[mapLoading]
+batchSize = 100
+maxAreas = 10
+
+# Standard map loading dimensions for /loadmap command
+[mapLoading.defaultArea]
+minX = 0
+minZ = 0
+maxX = 500
+maxZ = 500
+
+[messages]
+loadingInProgress = "Map loading is in progress. Areas remaining: {remaining}"
+loadingNotRunning = "Map loading is not running"
+invalidCoordinates = "Invalid coordinates! min must be less than max"
+loadingStarted = "Map loading started for area ({minX}, {minZ}) - ({maxX}, {maxZ})"
+
+helpUsage = "Usage of /loadmap command:"
+helpDefault = "/loadmap - start loading with default parameters"
+helpCustom = "/loadmap <minX> <minZ> <maxX> <maxZ> - start with custom coordinates"
+helpStatus = "/loadmap status - check loading status"
+helpInfo = "/loadmap help - command information"
+
+processingBatch = "Processing batch {currentBatch}/{totalBatches} ({percentage:.1f}%) - {batchSize} areas. Remaining: {remaining}"
+batchProcessed = "Batch of {batchSize} areas processed and removed"
+
+mapLoadingAlreadyRunning = "Map loading is already running!"
+mapLoadingStartedLog = "Map loading started. Total areas: {areaCount}"
+mapLoadingFinished = "Map loading completed!"
+
+# List of blocks that will be skipped during map processing.
+# Les entrees en ".png" de l'amont (restes de la table de textures) ont ete
+# retirees : elles ne correspondaient a aucun bloc et ne filtraient rien.
+[blacklist]
+blocks = [
+    "minecraft:oxidized_copper_door",
+    "minecraft:waxed_exposed_copper_door",
+    "minecraft:waxed_exposed_copper_trapdoor",
+    "minecraft:waxed_oxidized_copper_trapdoor",
+    "minecraft:waxed_oxidized_copper_door",
+    "minecraft:sculk_vein",
+    "minecraft:crimson_fungus",
+    "minecraft:acacia_wood",
+    "minecraft:warped_fungus",
+    "minecraft:composter",
+    "minecraft:cauldron",
+    "minecraft:ender_chest",
+    "minecraft:trapped_chest",
+    "minecraft:chest",
+    "minecraft:tuff_wall",
+    "minecraft:polished_tuff_wall",
+    "minecraft:small_amethyst_bud",
+    "minecraft:tuff_brick_wall",
+    "minecraft:weathered_copper_door",
+    "minecraft:waxed_weathered_copper_trapdoor",
+    "minecraft:waxed_weathered_copper_door",
+    "minecraft:waxed_copper_trapdoor",
+    "minecraft:waxed_copper_door",
+    "minecraft:purple_stained_glass_pane",
+    "minecraft:blue_stained_glass_pane",
+    "minecraft:light_blue_stained_glass_pane",
+    "minecraft:cyan_stained_glass_pane",
+    "minecraft:green_stained_glass_pane",
+    "minecraft:lime_stained_glass_pane",
+    "minecraft:yellow_stained_glass_pane",
+    "minecraft:orange_stained_glass_pane",
+    "minecraft:magenta_stained_glass_pane",
+    "minecraft:pink_stained_glass_pane",
+    "minecraft:ladder",
+    "minecraft:acacia_trapdoor",
+    "minecraft:jungle_trapdoor",
+    "minecraft:birch_trapdoor",
+    "minecraft:bamboo_door",
+    "minecraft:iron_door",
+    "minecraft:crimson_door",
+    "minecraft:warped_door",
+    "minecraft:bamboo_fence",
+    "minecraft:warped_fence_gate",
+    "minecraft:crimson_trapdoor",
+    "minecraft:nether_brick_fence",
+    "minecraft:mangrove_door",
+    "minecraft:crimson_fence",
+    "minecraft:cherry_door",
+    "minecraft:acacia_fence",
+    "minecraft:cherry_fence_gate",
+    "minecraft:cherry_trapdoor",
+    "minecraft:dark_oak_fence",
+    "minecraft:bamboo_trapdoor",
+    "minecraft:mangrove_fence",
+    "minecraft:bamboo_fence_gate",
+    "minecraft:cherry_fence",
+    "minecraft:crimson_fence_gate",
+    "minecraft:cobblestone_wall",
+    "minecraft:birch_fence_gate",
+    "minecraft:spruce_fence_gate",
+    "minecraft:birch_fence",
+    "minecraft:fence_gate",
+    "minecraft:jungle_fence",
+    "minecraft:warped_fence",
+    "minecraft:mangrove_trapdoor",
+    "minecraft:dark_oak_fence_gate",
+    "minecraft:acacia_fence_gate",
+    "minecraft:jungle_fence_gate",
+    "minecraft:mangrove_fence_gate",
+    "minecraft:deepslate_tile_wall",
+    "minecraft:dark_oak_door",
+    "minecraft:polished_deepslate_wall",
+    "minecraft:deepslate_brick_wall",
+    "minecraft:iron_bars",
+    "minecraft:mud_brick_wall",
+    "minecraft:polished_blackstone_wall",
+    "minecraft:birch_door",
+    "minecraft:polished_blackstone_brick_wall",
+    "minecraft:jungle_door",
+    "minecraft:cobbled_deepslate_wall",
+    "minecraft:acacia_door",
+    "minecraft:wooden_door",
+    "minecraft:spruce_fence",
+    "minecraft:spruce_door",
+    "minecraft:blackstone_wall",
+    "minecraft:oak_fence",
+    "minecraft:large_fern",
+    "minecraft:deadbush",
+    "minecraft:short_grass",
+    "minecraft:fern",
+    "minecraft:torchflower",
+    "minecraft:azure_bluet",
+    "minecraft:sunflower",
+    "minecraft:lily_of_the_valley",
+    "minecraft:wither_rose",
+    "minecraft:rose_bush",
+    "minecraft:pink_petals",
+    "minecraft:sweet_berry_bush",
+    "minecraft:pitcher_plant",
+    "minecraft:tall_grass",
+    "minecraft:peony",
+    "minecraft:cornflower",
+    "minecraft:oxeye_daisy",
+    "minecraft:pink_tulip",
+    "minecraft:white_tulip",
+    "minecraft:big_dripleaf",
+    "minecraft:poppy",
+    "minecraft:twisting_vines",
+    "minecraft:orange_tulip",
+    "minecraft:lilac",
+    "minecraft:yellow_flower",
+    "minecraft:medium_amethyst_bud",
+    "minecraft:seagrass",
+    "minecraft:glow_lichen",
+    "minecraft:reeds",
+    "minecraft:bubble_column",
+    "minecraft:pointed_dripstone",
+    "minecraft:vine",
+    "minecraft:air",
+    "minecraft:cactus_flower",
+    "minecraft:leaf_litter",
+    "minecraft:red_tulip",
+    "minecraft:bush",
+    "minecraft:firefly_bush",
+    "minecraft:tall_dry_grass",
+    "minecraft:bamboo",
+    "minecraft:short_dry_grass",
+    "minecraft:dandelion",
+]

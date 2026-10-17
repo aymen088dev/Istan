@@ -1,0 +1,381 @@
+/* =========================================================
+   STUDIO — états et panneaux secondaires
+
+   Recherche, santé des données, retours de publication.
+   Même palette et mêmes filets que app.css : cette feuille ne
+   définit que ce que le reste de l'interface n'a pas déjà.
+========================================================= */
+
+:root {
+    --studio-ok: #9ec9a5;
+    --studio-warn: #dfa463;
+    --studio-danger: #e58d7d;
+}
+
+/* ---------- Recherche ---------- */
+
+.search-count {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.04em;
+}
+
+.search-count[hidden] {
+    display: none;
+}
+
+.photo-missing {
+    color: var(--studio-warn);
+}
+
+.avatar-fallback {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.panel-empty .link-button {
+    margin-top: 6px;
+}
+
+.link-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+/* ---------- Cartes de profil ---------- */
+
+.profile-card[data-folder] {
+    position: relative;
+}
+
+.profile-card .profile-card-avatar img {
+    transition: transform 0.2s ease;
+}
+
+.profile-card:hover .profile-card-avatar img {
+    transform: scale(1.04);
+}
+
+/* ---------- Recherche dans la modale ---------- */
+
+.profile-modal-toolbar {
+    flex-wrap: wrap;
+}
+
+.profile-search-row {
+    display: flex;
+    flex: 1 1 100%;
+    order: 3;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-search-row .search-field {
+    flex: 1;
+}
+
+.profile-search-row .search-count {
+    margin: 0;
+}
+
+.search-empty {
+    grid-column: 1 / -1;
+}
+
+.empty-profiles {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 24px 14px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.empty-profiles strong {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.empty-profiles span {
+    max-width: 260px;
+    font-size: 9.5px;
+    line-height: 1.6;
+}
+
+/* ---------- Retours ---------- */
+
+.toast-success {
+    border-color: rgba(158, 201, 165, 0.35);
+}
+
+.toast-success .toast-mark {
+    background: var(--studio-ok);
+}
+
+.toast-warning {
+    border-color: rgba(223, 164, 99, 0.4);
+}
+
+.toast-warning .toast-mark {
+    background: var(--studio-warn);
+}
+
+.test-publish {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.16s ease, color 0.16s ease;
+}
+
+.test-publish:hover {
+    border-color: var(--line-strong);
+    color: var(--text);
+}
+
+.test-publish:disabled {
+    cursor: progress;
+    opacity: 0.5;
+}
+
+.publish-button.is-busy {
+    cursor: progress;
+    opacity: 0.85;
+}
+
+.publish-button.is-busy::after {
+    content: "";
+    width: 11px;
+    height: 11px;
+    border: 2px solid rgba(29, 20, 8, 0.3);
+    border-top-color: var(--accent-ink);
+    border-radius: 50%;
+    animation: studio-spin 0.7s linear infinite;
+}
+
+@keyframes studio-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Santé des données ---------- */
+
+.diagnostics-panel {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    border-color: var(--line) !important;
+    background: var(--surface) !important;
+}
+
+.diagnostics-panel h2 {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.diagnostics-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.diagnostic-metric {
+    display: grid;
+    gap: 3px;
+    padding: 8px 5px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    text-align: center;
+}
+
+.diagnostic-metric strong {
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.diagnostic-metric span {
+    color: var(--quiet);
+    font-family: var(--font-mono);
+    font-size: 7.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.diagnostics-photo {
+    display: grid;
+    gap: 3px;
+    margin: 0;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: 9px;
+    line-height: 1.55;
+}
+
+.diagnostics-photo.is-ok {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid rgba(158, 201, 165, 0.22);
+    background: rgba(158, 201, 165, 0.08);
+    color: #c4dfc8;
+}
+
+.diagnostics-photo.is-warning {
+    border: 1px solid rgba(223, 164, 99, 0.25);
+    background: rgba(223, 164, 99, 0.08);
+    color: #ecc9a2;
+}
+
+.diagnostics-photo strong {
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.diagnostics-photo em {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-style: normal;
+}
+
+.diagnostics-avatar-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    border: 1px solid rgba(223, 164, 99, 0.35);
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.diagnostics-avatar-link[hidden] {
+    display: none;
+}
+
+.diagnostics-avatar-link:hover {
+    border-color: rgba(223, 164, 99, 0.6);
+}
+
+.diagnostics-details {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+}
+
+.diagnostics-details summary {
+    padding: 8px 10px;
+    color: var(--muted);
+    font-size: 9px;
+    cursor: pointer;
+}
+
+.diagnostics-details ul {
+    display: grid;
+    gap: 6px;
+    max-height: 168px;
+    margin: 0;
+    padding: 0 10px 10px;
+    overflow: auto;
+    list-style: none;
+}
+
+.diagnostics-details li {
+    display: grid;
+    gap: 1px;
+    font-size: 8px;
+    line-height: 1.45;
+}
+
+.diagnostics-details li strong {
+    color: var(--text-soft);
+    font-size: 8.5px;
+}
+
+.diagnostics-details li span {
+    color: var(--quiet);
+}
+
+.diagnostics-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.diagnostics-import {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+
+.diagnostics-import:hover {
+    border-style: solid;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.diagnostics-import.is-busy {
+    pointer-events: none;
+    opacity: 0.55;
+}
+
+.diagnostics-progress {
+    color: var(--quiet);
+    font-size: 8px;
+}
+
+.diagnostics-hint {
+    margin: 0;
+    color: var(--quiet);
+    font-size: 8px;
+    line-height: 1.5;
+}
+
+@media (max-width: 1040px) {
+    .diagnostics-panel {
+        grid-column: span 1;
+    }
+}

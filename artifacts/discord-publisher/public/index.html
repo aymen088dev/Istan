@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0c0e0d">
+    <title>Publisher — Studio de publication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="modal.css">
+    <link rel="stylesheet" href="studio.css">
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+    <div class="page-glow" aria-hidden="true"></div>
+
+    <main class="app">
+        <header class="topbar">
+            <a class="brand" href="./" aria-label="Publisher, accueil">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" role="presentation">
+                        <path d="M8 8.5a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v11a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4z"></path>
+                        <path d="m12 12 4 3 4-3"></path>
+                        <path d="M12 27h8"></path>
+                    </svg>
+                </span>
+                <span class="brand-copy">
+                    <strong>Publisher</strong>
+                    <small>Studio Discord</small>
+                </span>
+            </a>
+
+            <nav class="workspace-tabs" aria-label="Espaces de travail">
+                <button class="workspace-tab is-active" id="publishingTab" type="button" aria-controls="publishingWorkspace" aria-selected="true">
+                    Publication
+                </button>
+                <button class="workspace-tab" id="moderationTab" type="button" aria-controls="moderationWorkspace" aria-selected="false">
+                    Modération
+                </button>
+            </nav>
+
+            <div class="topbar-actions">
+                <span class="connection-pill"><span class="status-dot"></span> Local</span>
+                <a class="topbar-link" href="/">Portail</a>
+                <button class="icon-button" id="focusSearchButton" type="button" aria-label="Rechercher un profil" title="Rechercher un profil (/)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7"></circle><path d="m16 16 5 5"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <div id="publishingWorkspace">
+            <section class="workspace-head">
+                <div class="workspace-title">
+                    <span class="kicker">Espace de publication</span>
+                    <h1>Prépare, vérifie, publie.</h1>
+                    <p>Un message, un salon, une identité. Le reste est déjà en place.</p>
+                </div>
+                <div class="head-stats" aria-label="Résumé">
+                    <div class="head-stat">
+                        <strong id="profileCount">—</strong>
+                        <span>profils</span>
+                    </div>
+                    <div class="head-stat">
+                        <strong id="categoryCount">—</strong>
+                        <span>catégories</span>
+                    </div>
+                    <div class="head-stat">
+                        <strong id="messageCount">—</strong>
+                        <span>messages</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="studio-grid">
+                <section class="composer-panel" aria-label="Composer une publication">
+                    <header class="panel-head">
+                        <h2>Nouvelle publication</h2>
+                        <span class="save-state" id="draftStatus">Brouillon sauvegardé</span>
+                    </header>
+
+                    <div class="destination-grid">
+                        <div class="destination">
+                            <span class="field-label">Salon Discord</span>
+                            <button id="webhookSelector" class="picker" type="button">
+                                <span class="picker-icon" aria-hidden="true">#</span>
+                                <span class="picker-copy">
+                                    <strong id="webhookName">Aucun webhook</strong>
+                                    <small id="webhookStatus">Sélectionner un salon</small>
+                                </span>
+                                <span class="picker-arrow" aria-hidden="true">▾</span>
+                            </button>
+                            <button id="addWebhookButton" class="inline-action" type="button">+ Ajouter un webhook</button>
+                        </div>
+
+                        <div class="destination">
+                            <span class="field-label">Identité de publication</span>
+                            <button id="profileSelector" class="picker" type="button">
+                                <span id="profileAvatar" class="picker-avatar">?</span>
+                                <span class="picker-copy">
+                                    <strong id="profileName">Aucun profil</strong>
+                                    <small id="profileStatus">Sélectionner un profil</small>
+                                </span>
+                                <span class="picker-arrow" aria-hidden="true">▾</span>
+                            </button>
+                            <button id="addProfileButton" class="inline-action" type="button">+ Créer un profil</button>
+                        </div>
+                    </div>
+
+                    <div class="composer-shell">
+                        <div class="composer-topline">
+                            <span class="composer-channel"><span class="hash">#</span><span id="composerChannel">salon sélectionné</span></span>
+                            <span class="composer-hint">Markdown Discord</span>
+                        </div>
+                        <textarea id="messageInput" placeholder="Écris ton message…" aria-label="Contenu du message" maxlength="2000"></textarea>
+                        <div class="composer-meta">
+                            <button class="subtle-button" id="clearDraftButton" type="button">Effacer le brouillon</button>
+                            <span class="character-limit"><strong id="messageLength">0</strong><span>/ 2000</span></span>
+                        </div>
+                    </div>
+
+                    <div class="media-block">
+                        <div class="media-head">
+                            <span class="field-label">Images</span>
+                            <span class="media-note">Jusqu'à 4 · PNG, JPG, WEBP, GIF</span>
+                        </div>
+                        <div id="imagesGrid" class="images-grid">
+                            <button class="image-slot" data-slot="0" type="button" aria-label="Ajouter une image">+</button>
+                            <button class="image-slot" data-slot="1" type="button" aria-label="Ajouter une image">+</button>
+                            <button class="image-slot" data-slot="2" type="button" aria-label="Ajouter une image">+</button>
+                            <button class="image-slot" data-slot="3" type="button" aria-label="Ajouter une image">+</button>
+                        </div>
+                    </div>
+
+                    <div class="publish-row">
+                        <span class="publish-note"><span class="status-dot"></span> Rien n'est envoyé avant validation</span>
+                        <button id="publishButton" class="publish-button" type="button">
+                            <span>Publier sur Discord</span>
+                            <span class="button-arrow" aria-hidden="true">↗</span>
+                        </button>
+                    </div>
+                </section>
+
+                <aside class="workspace-side">
+                    <section class="side-panel directory-panel">
+                        <div class="side-panel-heading">
+                            <div>
+                                <h2>Profils</h2>
+                                <span class="side-sub">Bibliothèque d'identités</span>
+                            </div>
+                            <button class="icon-button small-icon-button" id="sideDirectoryButton" type="button" aria-label="Ouvrir tous les profils">↗</button>
+                        </div>
+
+                        <label class="search-field" for="profileQuickSearch">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7"></circle><path d="m16 16 5 5"></path></svg>
+                            <input id="profileQuickSearch" type="search" placeholder="Rechercher…" autocomplete="off">
+                            <kbd>/</kbd>
+                        </label>
+                        <span class="search-count" id="quickSearchCount" hidden></span>
+
+                        <div class="category-filter-row" id="quickCategoryFilters">
+                            <button class="filter-chip is-active" type="button" data-category="all">Tous</button>
+                        </div>
+
+                        <div class="profile-list" id="recentProfiles">
+                            <div class="panel-loading">Chargement de la bibliothèque…</div>
+                        </div>
+
+                        <button class="full-width-action" id="viewAllProfilesButton" type="button">Parcourir tous les profils <span>→</span></button>
+                    </section>
+
+                    <section class="side-panel tip-panel">
+                        <span class="tip-icon">i</span>
+                        <div>
+                            <strong>Session mémorisée</strong>
+                            <p>Ton dernier profil et ta dernière catégorie sont conservés sur cet appareil.</p>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+
+            <section id="discordMessagesSection" class="feed-panel">
+                <div class="feed-head">
+                    <div>
+                        <h2>Derniers messages</h2>
+                        <p id="messageFeedSummary">6 derniers messages</p>
+                    </div>
+                    <div class="feed-actions">
+                        <span class="live-pill"><span class="status-dot"></span> Direct</span>
+                        <button id="refreshDiscordMessages" class="btn btn-secondary" type="button">Actualiser</button>
+                    </div>
+                </div>
+                <div id="discordMessages" class="discord-messages">
+                    <div class="discord-messages-empty">Chargement des messages…</div>
+                </div>
+            </section>
+        </div>
+
+        <section id="moderationWorkspace" class="moderation-workspace" hidden>
+            <div class="workspace-head">
+                <div class="workspace-title">
+                    <span class="kicker">Espace modération</span>
+                    <h1>Mute et ban RP</h1>
+                    <p>Journalise une sanction dans le salon, sans action réelle sur Discord.</p>
+                </div>
+                <span class="moderation-safety-badge">Trace interne</span>
+            </div>
+
+            <div id="moderationLocked" class="moderation-locked">
+                <span class="moderation-lock-icon">!</span>
+                <div>
+                    <strong>Accès réservé aux rôles Modo, SM et Admin</strong>
+                    <p>Choisis un profil disposant d'un rôle de modération depuis l'espace Publication.</p>
+                </div>
+            </div>
+
+            <div id="moderationPanel" class="moderation-panel" hidden>
+                <div class="moderation-actor-card">
+                    <span class="moderation-actor-avatar" id="moderationActorAvatar">?</span>
+                    <div>
+                        <span class="kicker">Modérateur actif</span>
+                        <strong id="moderationActor">Aucun profil</strong>
+                        <small id="moderationActorRole">—</small>
+                    </div>
+                </div>
+
+                <div class="moderation-form">
+                    <label class="form-label">Profil ciblé</label>
+                    <div id="moderationTarget" class="moderation-target-wrapper"></div>
+
+                    <label class="form-label" for="moderationReason">Motif (facultatif)</label>
+                    <textarea id="moderationReason" class="form-input moderation-reason" maxlength="500" placeholder="Explique l'action…"></textarea>
+
+                    <div class="moderation-actions">
+                        <button id="muteProfileButton" class="btn btn-secondary moderation-mute" type="button">Mute</button>
+                        <button id="banProfileButton" class="btn btn-danger" type="button">Ban</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            <span>Publisher · ISTAN Projects</span>
+            <a href="/">Retour au portail</a>
+        </footer>
+    </main>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+    <script src="index.js"></script>
+    <script src="enhancements.js"></script>
+</body>
+
+</html>

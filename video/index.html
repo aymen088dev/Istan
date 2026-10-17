@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>ISTAN Projects — un seul serveur, tous tes projets</title>
+    <style>
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: block;
+        src: url("assets/fonts/inter-normal-400.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Instrument Serif";
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url("assets/fonts/instrument-serif-normal-400.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Instrument Serif";
+        font-style: italic;
+        font-weight: 400;
+        font-display: block;
+        src: url("assets/fonts/instrument-serif-italic-400.woff2") format("woff2");
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #08090b;
+      }
+
+      body {
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        color: #f2f1ec;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #stage {
+        position: absolute;
+        inset: 0;
+        background: #08090b;
+        overflow: hidden;
+      }
+
+      .bg {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(1200px 900px at 50% -10%, rgba(255, 255, 255, 0.055), transparent 60%),
+          #08090b;
+      }
+
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+        background-size: 220px 220px;
+        mix-blend-mode: overlay;
+      }
+
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(120% 80% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        padding: 112px 72px 260px;
+      }
+
+      .glow {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(120px);
+        opacity: 0.32;
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #9aa0a8;
+      }
+
+      .eyebrow .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: #c8ff3d;
+      }
+
+      .display {
+        font-weight: 800;
+        font-size: 118px;
+        line-height: 0.9;
+        letter-spacing: -0.045em;
+        text-transform: uppercase;
+      }
+
+      .display .serif {
+        text-transform: none;
+      }
+
+      .serif {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: -0.015em;
+      }
+
+      .c-green { color: #6ee7a8; }
+      .c-blurple { color: #8b93ff; }
+      .c-lime { color: #c8ff3d; }
+      .c-cyan { color: #67e8f9; }
+
+      .dim { color: #8a8f98; }
+
+      .card {
+        background: #111318;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 26px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 22px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 24px;
+        font-weight: 500;
+        color: #d7dae0;
+        white-space: nowrap;
+      }
+
+      .chip b {
+        font-weight: 700;
+        color: #f2f1ec;
+      }
+
+      /* ---------------- S1 ---------------- */
+
+      #s1-hero {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        top: 470px;
+      }
+
+      #s1 .l2 {
+        color: #f2f1ec;
+      }
+
+      #s1 .sub {
+        margin-top: 40px;
+        font-size: 32px;
+        line-height: 1.35;
+        color: #9aa0a8;
+        max-width: 720px;
+      }
+
+      #s1-grid {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 300px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .mini {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 26px 24px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #0e1014;
+      }
+
+      .mini .ic {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .mini .nm {
+        font-size: 23px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .mini .ct {
+        font-size: 18px;
+        color: #7d838c;
+        margin-top: 4px;
+      }
+
+      /* ---------------- S2 ---------------- */
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .mark {
+        width: 74px;
+        height: 74px;
+        border-radius: 22px;
+        background: #c8ff3d;
+        color: #0a0b0d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        position: relative;
+      }
+
+      .mark .ping {
+        position: absolute;
+        right: -4px;
+        top: -4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: #08090b;
+        border: 3px solid #c8ff3d;
+      }
+
+      .wordmark {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .wordmark span {
+        color: #8a8f98;
+        font-weight: 500;
+      }
+
+      #s2 .eyebrow {
+        margin-top: 96px;
+      }
+
+      #s2 .display {
+        margin-top: 26px;
+        font-size: 104px;
+      }
+
+      #s2 .display .serif {
+        font-size: 112px;
+      }
+
+      #s2-list {
+        margin-top: 56px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .proj {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 26px 26px;
+        border-radius: 24px;
+        background: #0f1115;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .proj .ic {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .proj .tt {
+        font-size: 27px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .proj .cc {
+        font-size: 19px;
+        color: #7d838c;
+        margin-top: 5px;
+      }
+
+      .proj .go {
+        margin-left: auto;
+        color: #5d636c;
+        font-size: 30px;
+      }
+
+      #s2-chips {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 268px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      /* ---------------- S3 ---------------- */
+
+      .scene-head .display {
+        font-size: 104px;
+      }
+
+      .scene-head .display .serif {
+        font-size: 112px;
+      }
+
+      .label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .index {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #6a707a;
+      }
+
+      .field-wrap {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        top: 590px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .field {
+        position: relative;
+        width: 620px;
+        height: 780px;
+        border-radius: 30px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #0e2419 0%, #0a1711 60%, #081310 100%);
+        border: 1px solid rgba(110, 231, 168, 0.22);
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+      }
+
+      .field .ln {
+        position: absolute;
+        background: rgba(190, 255, 220, 0.16);
+      }
+
+      .field .mid {
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 2px;
+      }
+
+      .field .circle {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 190px;
+        height: 190px;
+        border: 2px solid rgba(190, 255, 220, 0.16);
+        border-radius: 999px;
+        margin-left: -95px;
+        margin-top: -95px;
+      }
+
+      .field .box {
+        position: absolute;
+        left: 50%;
+        width: 300px;
+        height: 120px;
+        border: 2px solid rgba(190, 255, 220, 0.16);
+        margin-left: -150px;
+      }
+
+      .field .box.top { top: 0; border-top: 0; }
+      .field .box.bot { bottom: 0; border-bottom: 0; }
+
+      .slot {
+        position: absolute;
+        transform: translate(-50%, -50%);
+      }
+
+      .player {
+        width: 82px;
+        height: 82px;
+        border-radius: 999px;
+        background: #0c1210;
+        border: 2px solid rgba(110, 231, 168, 0.45);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+      }
+
+      .player b {
+        font-size: 26px;
+        font-weight: 700;
+        color: #eafff2;
+      }
+
+      .player span {
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        color: #6ee7a8;
+        margin-top: 2px;
+      }
+
+      #s3-tags {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 300px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .toast {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 200px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 24px 26px;
+        border-radius: 22px;
+        background: #101a15;
+        border: 1px solid rgba(110, 231, 168, 0.3);
+      }
+
+      .toast .ok {
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        background: #6ee7a8;
+        color: #06281a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 800;
+      }
+
+      .toast .tx {
+        font-size: 24px;
+        color: #cfe9db;
+      }
+
+      .toast .tx b {
+        color: #f2f1ec;
+      }
+
+      /* ---------------- S4 ---------------- */
+
+      .msg {
+        margin-top: 56px;
+        padding: 30px;
+        border-radius: 28px;
+        background: #12141a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.45);
+      }
+
+      .msg-head {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 999px;
+        background: linear-gradient(140deg, #5865f2, #8b93ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 800;
+        color: #0b0c10;
+      }
+
+      .who {
+        font-size: 26px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .badge {
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        background: #8b93ff;
+        color: #0b0c10;
+        font-size: 15px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .role {
+        font-size: 19px;
+        color: #7e8492;
+        margin-top: 5px;
+      }
+
+      .msg-body {
+        margin-top: 22px;
+        font-size: 30px;
+        line-height: 1.4;
+        color: #dfe2e8;
+      }
+
+      .embed {
+        margin-top: 24px;
+        border-left: 4px solid #8b93ff;
+        background: #171a22;
+        border-radius: 0 18px 18px 0;
+        padding: 24px 26px;
+      }
+
+      .embed .tt {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #b9bfff;
+      }
+
+      .embed .row {
+        display: flex;
+        gap: 18px;
+        margin-top: 16px;
+        font-size: 23px;
+        color: #9aa0ad;
+      }
+
+      .embed .row b {
+        color: #eef0f5;
+        font-weight: 600;
+      }
+
+      .log {
+        margin-top: 26px;
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: #0e1015;
+      }
+
+      .log-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 20px 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .log-row:first-child {
+        border-top: 0;
+      }
+
+      .tag {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 8px 12px;
+        border-radius: 9px;
+        background: rgba(139, 147, 255, 0.14);
+        color: #aeb4ff;
+      }
+
+      .log-row .txt {
+        font-size: 21px;
+        color: #b9bec7;
+      }
+
+      .log-row .time {
+        margin-left: auto;
+        font-size: 19px;
+        color: #838890;
+      }
+
+      .composer {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: #15171d;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .composer .ph {
+        font-size: 22px;
+        color: #7b818b;
+        flex: 1;
+      }
+
+      .composer .send {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: #8b93ff;
+        color: #0b0c10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      /* ---------------- S5 ---------------- */
+
+      #s5 .big {
+        display: flex;
+        align-items: baseline;
+        gap: 26px;
+        margin-top: 18px;
+      }
+
+      #mercato-count {
+        font-size: 300px;
+        font-weight: 800;
+        line-height: 0.82;
+        letter-spacing: -0.06em;
+        color: #c8ff3d;
+      }
+
+      .big .unit {
+        font-size: 40px;
+        font-weight: 600;
+        color: #dfe3d0;
+        letter-spacing: 0.01em;
+      }
+
+      .stats {
+        margin-top: 26px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .rows {
+        margin-top: 42px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .tr {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 22px 24px;
+        border-radius: 20px;
+        background: #0f1115;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .tr .nm {
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .tr .cl {
+        font-size: 18px;
+        color: #868c95;
+        margin-top: 4px;
+      }
+
+      .tr .fee {
+        margin-left: auto;
+        font-size: 23px;
+        font-weight: 700;
+        color: #c8ff3d;
+        white-space: nowrap;
+      }
+
+      .tr .type {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        padding: 7px 10px;
+        border-radius: 8px;
+        background: rgba(200, 255, 61, 0.12);
+        color: #c8ff3d;
+      }
+
+      #s5-export {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 250px;
+        display: flex;
+        gap: 12px;
+      }
+
+      /* ---------------- S6 ---------------- */
+
+      .map {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        top: 560px;
+        height: 800px;
+        border-radius: 30px;
+        overflow: hidden;
+        background: radial-gradient(700px 500px at 50% 30%, #0d2a30 0%, #081418 65%, #060e11 100%);
+        border: 1px solid rgba(103, 232, 249, 0.2);
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+      }
+
+      .map .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(103, 232, 249, 0.09) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(103, 232, 249, 0.09) 1px, transparent 1px);
+        background-size: 52px 52px;
+      }
+
+      .terrain {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(2px);
+      }
+
+      .chunk {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid rgba(103, 232, 249, 0.35);
+        background: rgba(103, 232, 249, 0.08);
+      }
+
+      .pin {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        margin: -15px 0 0 -15px;
+        border-radius: 999px;
+        background: #67e8f9;
+        border: 4px solid #06161a;
+        box-shadow: 0 0 0 6px rgba(103, 232, 249, 0.22);
+      }
+
+      .map-hud {
+        position: absolute;
+        left: 24px;
+        bottom: 24px;
+        right: 24px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .hud {
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(6, 14, 17, 0.82);
+        border: 1px solid rgba(103, 232, 249, 0.25);
+        font-size: 19px;
+        color: #bfeff7;
+        white-space: nowrap;
+      }
+
+      .hud b {
+        color: #67e8f9;
+        font-weight: 700;
+      }
+
+      #s6-tags {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 270px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      /* ---------------- S7 ---------------- */
+
+      #s7 .center {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        top: 360px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      #s7 .mark-lg {
+        width: 150px;
+        height: 150px;
+        border-radius: 44px;
+        background: #c8ff3d;
+        color: #0a0b0d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 78px;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        position: relative;
+      }
+
+      #s7 .mark-lg .ping {
+        position: absolute;
+        right: -8px;
+        top: -8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: #08090b;
+        border: 5px solid #c8ff3d;
+      }
+
+      #s7 .wm {
+        margin-top: 34px;
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: 0.22em;
+      }
+
+      #s7 .display {
+        margin-top: 22px;
+        font-size: 104px;
+      }
+
+      #s7 .display .serif {
+        font-size: 116px;
+      }
+
+      #s7 .tiles {
+        margin-top: 46px;
+        display: flex;
+        gap: 14px;
+      }
+
+      #s7 .tile {
+        width: 84px;
+        height: 10px;
+        border-radius: 999px;
+      }
+
+      #s7 .cmd {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+
+      #s7 .cmd .code {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 28px;
+        border-radius: 18px;
+        background: #0e1014;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 26px;
+        color: #dfe3e8;
+        font-family: monospace;
+      }
+
+      #s7 .cmd .code .p {
+        color: #c8ff3d;
+      }
+
+      #s7 .cmd .hint {
+        font-size: 21px;
+        color: #7c828b;
+      }
+
+      #fade {
+        position: absolute;
+        inset: 0;
+        background: #08090b;
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="istan"
+      data-start="0"
+      data-duration="70.5"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      <div id="stage">
+        <div class="bg"></div>
+
+        <!-- 01 — Ouverture -->
+        <section class="scene clip" id="s1" data-start="0" data-duration="7" data-track-index="1">
+          <div class="glow" data-layout-allow-overflow style="width: 760px; height: 760px; left: -220px; top: -180px; background: #c8ff3d"></div>
+          <div class="eyebrow" id="s1-eyebrow"><span class="dot"></span> Istan Projects · serveur privé</div>
+
+          <div id="s1-hero">
+            <div class="display" id="s1-l1">Un serveur.</div>
+            <div class="display" id="s1-l2">Tous tes</div>
+            <div class="display"><span class="serif c-lime" id="s1-l3">projets.</span></div>
+            <div class="sub" id="s1-sub">Quatre outils, une seule adresse.</div>
+          </div>
+
+          <div id="s1-grid">
+            <div class="mini" id="s1-c1">
+              <div class="ic c-green">⚽</div>
+              <div>
+                <div class="nm">Creator</div>
+                <div class="ct">Compos &amp; clubs</div>
+              </div>
+            </div>
+            <div class="mini" id="s1-c2">
+              <div class="ic c-blurple">✉</div>
+              <div>
+                <div class="nm">Publisher</div>
+                <div class="ct">Discord</div>
+              </div>
+            </div>
+            <div class="mini" id="s1-c3">
+              <div class="ic c-lime">⇄</div>
+              <div>
+                <div class="nm">Mercato</div>
+                <div class="ct">Transferts</div>
+              </div>
+            </div>
+            <div class="mini" id="s1-c4">
+              <div class="ic c-cyan">⌖</div>
+              <div>
+                <div class="nm">MipMap</div>
+                <div class="ct">Monde Minecraft</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 02 — Le portail -->
+        <section class="scene clip" id="s2" data-start="7" data-duration="8.5" data-track-index="2">
+          <div class="glow" data-layout-allow-overflow style="width: 800px; height: 800px; right: -260px; top: -220px; background: #8b93ff"></div>
+
+          <div class="topbar" id="s2-top">
+            <div class="brand">
+              <div class="mark">I<span class="ping"></span></div>
+              <div class="wordmark">ISTAN <span>PROJECTS</span></div>
+            </div>
+            <div class="chip">4 projets</div>
+          </div>
+
+          <div class="eyebrow" id="s2-eyebrow"><span class="dot"></span> Le portail</div>
+          <div class="display" id="s2-title1">Un accès.</div>
+          <div class="display" id="s2-title2"><span class="serif c-lime">Tout le reste.</span></div>
+
+          <div id="s2-list">
+            <div class="proj" id="s2-p1">
+              <div class="ic c-green">⚽</div>
+              <div>
+                <div class="tt">ISTAN CREATOR</div>
+                <div class="cc">Composition &amp; gestion d’équipes</div>
+              </div>
+              <div class="go">›</div>
+            </div>
+            <div class="proj" id="s2-p2">
+              <div class="ic c-blurple">✉</div>
+              <div>
+                <div class="tt">Discord Publisher</div>
+                <div class="cc">Publication &amp; modération</div>
+              </div>
+              <div class="go">›</div>
+            </div>
+            <div class="proj" id="s2-p3">
+              <div class="ic c-lime">⇄</div>
+              <div>
+                <div class="tt">Mercato Analyser</div>
+                <div class="cc">Analyse des transferts</div>
+              </div>
+              <div class="go">›</div>
+            </div>
+            <div class="proj" id="s2-p4">
+              <div class="ic c-cyan">⌖</div>
+              <div>
+                <div class="tt">Webmap MipMap</div>
+                <div class="cc">Carte du serveur Minecraft</div>
+              </div>
+              <div class="go">›</div>
+            </div>
+          </div>
+
+          <div id="s2-chips">
+            <div class="chip"><b>node</b> start.js</div>
+            <div class="chip">une seule adresse</div>
+          </div>
+        </section>
+
+        <!-- 03 — Creator -->
+        <section class="scene clip" id="s3" data-start="15.5" data-duration="11" data-track-index="3">
+          <div class="glow" data-layout-allow-overflow style="width: 720px; height: 720px; left: 50%; top: 220px; margin-left: -360px; background: #6ee7a8"></div>
+
+          <div class="label-row" id="s3-label">
+            <div class="eyebrow"><span class="dot" style="background: #6ee7a8"></span> 01 · Creator</div>
+            <div class="index">01 / 04</div>
+          </div>
+
+          <div class="scene-head" id="s3-title">
+            <div class="display" style="margin-top: 30px">Composer.</div>
+            <div class="display"><span class="serif c-green">tes équipes.</span></div>
+          </div>
+
+          <div class="field-wrap" id="s3-field-wrap">
+            <div class="field" id="s3-field">
+              <div class="ln mid"></div>
+              <div class="circle"></div>
+              <div class="box top"></div>
+              <div class="box bot"></div>
+
+              <div class="slot" style="left: 50%; top: 87%"><div class="player" id="s3-p11"><b>1</b><span>GK</span></div></div>
+              <div class="slot" style="left: 18%; top: 70%"><div class="player" id="s3-p10"><b>2</b><span>DD</span></div></div>
+              <div class="slot" style="left: 39%; top: 73%"><div class="player" id="s3-p9"><b>4</b><span>DC</span></div></div>
+              <div class="slot" style="left: 61%; top: 73%"><div class="player" id="s3-p8"><b>5</b><span>DC</span></div></div>
+              <div class="slot" style="left: 82%; top: 70%"><div class="player" id="s3-p7"><b>3</b><span>DG</span></div></div>
+              <div class="slot" style="left: 26%; top: 48%"><div class="player" id="s3-p6"><b>8</b><span>MC</span></div></div>
+              <div class="slot" style="left: 50%; top: 52%"><div class="player" id="s3-p5"><b>6</b><span>MDC</span></div></div>
+              <div class="slot" style="left: 74%; top: 48%"><div class="player" id="s3-p4"><b>10</b><span>MOC</span></div></div>
+              <div class="slot" style="left: 20%; top: 27%"><div class="player" id="s3-p3"><b>7</b><span>AIL</span></div></div>
+              <div class="slot" style="left: 50%; top: 22%"><div class="player" id="s3-p2"><b>9</b><span>BU</span></div></div>
+              <div class="slot" style="left: 80%; top: 27%"><div class="player" id="s3-p1"><b>11</b><span>AID</span></div></div>
+            </div>
+          </div>
+
+          <div id="s3-tags">
+            <div class="chip" id="s3-t1"><b>Foot</b> · Hockey</div>
+            <div class="chip" id="s3-t2">Clubs &amp; effectifs</div>
+            <div class="chip" id="s3-t3">Export visuel</div>
+          </div>
+
+          <div class="toast" id="s3-toast">
+            <div class="ok">✓</div>
+            <div class="tx"><b>Composition exportée</b> — prête à publier</div>
+          </div>
+        </section>
+
+        <!-- 04 — Publisher -->
+        <section class="scene clip" id="s4" data-start="26.5" data-duration="11" data-track-index="4">
+          <div class="glow" data-layout-allow-overflow style="width: 760px; height: 760px; right: -200px; top: 120px; background: #8b93ff"></div>
+
+          <div class="label-row" id="s4-label">
+            <div class="eyebrow"><span class="dot" style="background: #8b93ff"></span> 02 · Publisher</div>
+            <div class="index">02 / 04</div>
+          </div>
+
+          <div class="scene-head" id="s4-title">
+            <div class="display" style="margin-top: 30px">Publier.</div>
+            <div class="display"><span class="serif c-blurple">sous ton identité.</span></div>
+          </div>
+
+          <div class="msg" id="s4-msg">
+            <div class="msg-head">
+              <div class="avatar">R</div>
+              <div>
+                <div class="who">Rayan<span class="badge">✓</span></div>
+                <div class="role">Direction sportive · via webhook</div>
+              </div>
+            </div>
+            <div class="msg-body" id="s4-text">Le club officialise le départ de M. Diallo.</div>
+            <div class="embed" id="s4-embed">
+              <div class="tt">OFFICIEL · TRANSFERT</div>
+              <div class="row"><span>Vers</span><b>Olympique de Marseille</b></div>
+              <div class="row"><span>Montant</span><b>32 M€ · bonus 4 M€</b></div>
+            </div>
+          </div>
+
+          <div class="log" id="s4-log">
+            <div class="log-row" id="s4-l1"><span class="tag">MUTE</span><span class="txt">12 min · spam dans #général</span><span class="time">21:04</span></div>
+            <div class="log-row" id="s4-l2"><span class="tag">BAN RP</span><span class="txt">24 h · non-respect du scénario</span><span class="time">21:07</span></div>
+          </div>
+
+          <div class="composer" id="s4-composer">
+            <div class="ph">Écrire un message…</div>
+            <div class="send">↑</div>
+          </div>
+        </section>
+
+        <!-- 05 — Mercato -->
+        <section class="scene clip" id="s5" data-start="37.5" data-duration="13" data-track-index="5">
+          <div class="glow" data-layout-allow-overflow style="width: 820px; height: 820px; left: -280px; top: 100px; background: #c8ff3d"></div>
+
+          <div class="label-row" id="s5-label">
+            <div class="eyebrow"><span class="dot" style="background: #c8ff3d"></span> 03 · Mercato Analyser</div>
+            <div class="index">03 / 04</div>
+          </div>
+
+          <div class="scene-head" id="s5-title">
+            <div class="display" style="margin-top: 30px">Analyser.</div>
+            <div class="display"><span class="serif c-lime">le mercato.</span></div>
+          </div>
+
+          <div class="big" id="s5-big">
+            <div id="mercato-count">0</div>
+            <div class="unit">transferts<br />détectés</div>
+          </div>
+
+          <div class="stats" id="s5-stats">
+            <div class="chip"><b>4 mois</b> relus</div>
+            <div class="chip"><b>341</b> messages</div>
+            <div class="chip">0 lot en échec</div>
+          </div>
+
+          <div class="rows">
+            <div class="tr" id="s5-r1">
+              <div>
+                <div class="nm">M. Diallo</div>
+                <div class="cl">LOSC → Olympique de Marseille</div>
+              </div>
+              <div class="type">TRANSFERT</div>
+              <div class="fee">32 M€</div>
+            </div>
+            <div class="tr" id="s5-r2">
+              <div>
+                <div class="nm">L. Moreau</div>
+                <div class="cl">AS Monaco → Stade Rennais</div>
+              </div>
+              <div class="type">PRÊT</div>
+              <div class="fee">sans option</div>
+            </div>
+            <div class="tr" id="s5-r3">
+              <div>
+                <div class="nm">K. Traoré</div>
+                <div class="cl">Libre → RC Lens</div>
+              </div>
+              <div class="type">LIBRE</div>
+              <div class="fee">0 €</div>
+            </div>
+            <div class="tr" id="s5-r4">
+              <div>
+                <div class="nm">J. Bernard</div>
+                <div class="cl">Prêt terminé → OGC Nice</div>
+              </div>
+              <div class="type">RETOUR</div>
+              <div class="fee">—</div>
+            </div>
+          </div>
+
+          <div id="s5-export">
+            <div class="chip"><b>Export</b> CSV</div>
+            <div class="chip"><b>Export</b> JSON</div>
+            <div class="chip">joueur · clubs · montant</div>
+          </div>
+        </section>
+
+        <!-- 06 — MipMap -->
+        <section class="scene clip" id="s6" data-start="50.5" data-duration="10" data-track-index="6">
+          <div class="glow" data-layout-allow-overflow style="width: 800px; height: 800px; left: 50%; top: 120px; margin-left: -400px; background: #67e8f9"></div>
+
+          <div class="label-row" id="s6-label">
+            <div class="eyebrow"><span class="dot" style="background: #67e8f9"></span> 04 · MipMap</div>
+            <div class="index">04 / 04</div>
+          </div>
+
+          <div class="scene-head" id="s6-title">
+            <div class="display" style="margin-top: 30px">Explorer.</div>
+            <div class="display"><span class="serif c-cyan">ton monde.</span></div>
+          </div>
+
+          <div class="map" id="s6-map">
+            <div class="grid"></div>
+            <div class="terrain" style="left: 60px; top: 90px; width: 420px; height: 300px; background: #123c33"></div>
+            <div class="terrain" style="left: 380px; top: 300px; width: 480px; height: 380px; background: #0f3540"></div>
+            <div class="terrain" style="left: 90px; top: 470px; width: 300px; height: 250px; background: #14423a"></div>
+            <div class="terrain" style="left: 560px; top: 80px; width: 260px; height: 200px; background: #10323a"></div>
+
+            <div class="chunk" id="s6-c1" style="left: 140px; top: 160px"></div>
+            <div class="chunk" id="s6-c2" style="left: 196px; top: 160px"></div>
+            <div class="chunk" id="s6-c3" style="left: 140px; top: 216px"></div>
+            <div class="chunk" id="s6-c4" style="left: 440px; top: 380px"></div>
+            <div class="chunk" id="s6-c5" style="left: 496px; top: 380px"></div>
+            <div class="chunk" id="s6-c6" style="left: 440px; top: 436px"></div>
+            <div class="chunk" id="s6-c7" style="left: 620px; top: 150px"></div>
+            <div class="chunk" id="s6-c8" style="left: 180px; top: 540px"></div>
+
+            <div class="pin" id="s6-pin1" style="left: 320px; top: 280px"></div>
+            <div class="pin" id="s6-pin2" style="left: 610px; top: 470px"></div>
+            <div class="pin" id="s6-pin3" style="left: 250px; top: 590px"></div>
+
+            <div class="map-hud" id="s6-hud">
+              <div class="hud"><b>3</b> joueurs en ligne</div>
+              <div class="hud">x <b>-128</b> · z <b>342</b></div>
+              <div class="hud"><b>1 024</b> chunks</div>
+            </div>
+          </div>
+
+          <div id="s6-tags">
+            <div class="chip">Relief &amp; carte</div>
+            <div class="chip">Plugin Endstone côté serveur</div>
+          </div>
+        </section>
+
+        <!-- 07 — Sortie -->
+        <section class="scene clip" id="s7" data-start="60.5" data-duration="10" data-track-index="7">
+          <div class="glow" data-layout-allow-overflow style="width: 900px; height: 900px; left: 50%; top: 260px; margin-left: -450px; background: #c8ff3d"></div>
+
+          <div class="center" id="s7-center">
+            <div class="mark-lg" id="s7-mark">I<span class="ping"></span></div>
+            <div class="wm" id="s7-wm">ISTAN PROJECTS</div>
+            <div class="display" id="s7-title1">Vos projets.</div>
+            <div class="display"><span class="serif c-lime" id="s7-title2">Un seul accès.</span></div>
+            <div class="tiles" id="s7-tiles">
+              <div class="tile" id="s7-t1" style="background: #6ee7a8"></div>
+              <div class="tile" id="s7-t2" style="background: #8b93ff"></div>
+              <div class="tile" id="s7-t3" style="background: #c8ff3d"></div>
+              <div class="tile" id="s7-t4" style="background: #67e8f9"></div>
+            </div>
+          </div>
+
+          <div class="cmd" id="s7-cmd">
+            <div class="code"><span class="p">$</span> node start.js</div>
+            <div class="hint">Un seul serveur à démarrer.</div>
+          </div>
+        </section>
+
+        <div class="grain"></div>
+        <div class="vignette"></div>
+        <div id="fade"></div>
+
+        <audio id="score" class="clip" data-start="0" data-duration="70.5" data-track-index="20" data-volume="0.9" src="assets/audio/score.wav"></audio>
+        <audio id="voice" class="clip" data-start="0" data-duration="70.5" data-track-index="21" data-volume="0.85" src="assets/audio/voice.wav"></audio>
+
+        <audio id="sfx-w1" class="clip" data-start="6.55" data-duration="0.85" data-track-index="22" data-volume="0.5" src="assets/audio/sfx-whoosh.wav"></audio>
+        <audio id="sfx-w2" class="clip" data-start="15.05" data-duration="0.85" data-track-index="22" data-volume="0.5" src="assets/audio/sfx-whoosh.wav"></audio>
+        <audio id="sfx-w3" class="clip" data-start="26.1" data-duration="0.85" data-track-index="22" data-volume="0.5" src="assets/audio/sfx-whoosh.wav"></audio>
+        <audio id="sfx-w4" class="clip" data-start="37.05" data-duration="0.85" data-track-index="22" data-volume="0.5" src="assets/audio/sfx-whoosh.wav"></audio>
+        <audio id="sfx-w5" class="clip" data-start="50.05" data-duration="0.85" data-track-index="22" data-volume="0.5" src="assets/audio/sfx-whoosh.wav"></audio>
+        <audio id="sfx-w6" class="clip" data-start="60.05" data-duration="0.85" data-track-index="22" data-volume="0.5" src="assets/audio/sfx-whoosh.wav"></audio>
+
+        <audio id="sfx-i1" class="clip" data-start="7.0" data-duration="1.3" data-track-index="23" data-volume="0.32" src="assets/audio/sfx-impact.wav"></audio>
+        <audio id="sfx-i2" class="clip" data-start="15.5" data-duration="1.3" data-track-index="23" data-volume="0.32" src="assets/audio/sfx-impact.wav"></audio>
+        <audio id="sfx-i3" class="clip" data-start="37.5" data-duration="1.3" data-track-index="23" data-volume="0.32" src="assets/audio/sfx-impact.wav"></audio>
+        <audio id="sfx-i4" class="clip" data-start="60.5" data-duration="1.3" data-track-index="23" data-volume="0.38" src="assets/audio/sfx-impact.wav"></audio>
+
+        <audio id="sfx-r1" class="clip" data-start="13.95" data-duration="1.6" data-track-index="24" data-volume="0.2" src="assets/audio/sfx-riser.wav"></audio>
+        <audio id="sfx-r2" class="clip" data-start="35.95" data-duration="1.6" data-track-index="24" data-volume="0.2" src="assets/audio/sfx-riser.wav"></audio>
+        <audio id="sfx-r3" class="clip" data-start="48.95" data-duration="1.6" data-track-index="24" data-volume="0.2" src="assets/audio/sfx-riser.wav"></audio>
+        <audio id="sfx-r4" class="clip" data-start="58.95" data-duration="1.6" data-track-index="24" data-volume="0.2" src="assets/audio/sfx-riser.wav"></audio>
+
+        <audio id="sfx-p1" class="clip" data-start="38.9" data-duration="0.14" data-track-index="25" data-volume="0.3" src="assets/audio/sfx-pop.wav"></audio>
+        <audio id="sfx-p2" class="clip" data-start="39.5" data-duration="0.14" data-track-index="25" data-volume="0.3" src="assets/audio/sfx-pop.wav"></audio>
+        <audio id="sfx-p3" class="clip" data-start="40.1" data-duration="0.14" data-track-index="25" data-volume="0.3" src="assets/audio/sfx-pop.wav"></audio>
+        <audio id="sfx-p4" class="clip" data-start="40.7" data-duration="0.14" data-track-index="25" data-volume="0.3" src="assets/audio/sfx-pop.wav"></audio>
+
+        <audio id="sfx-t1" class="clip" data-start="42.4" data-duration="0.07" data-track-index="26" data-volume="0.22" src="assets/audio/sfx-tick.wav"></audio>
+        <audio id="sfx-t2" class="clip" data-start="43.1" data-duration="0.07" data-track-index="26" data-volume="0.22" src="assets/audio/sfx-tick.wav"></audio>
+        <audio id="sfx-t3" class="clip" data-start="43.8" data-duration="0.07" data-track-index="26" data-volume="0.22" src="assets/audio/sfx-tick.wav"></audio>
+        <audio id="sfx-t4" class="clip" data-start="44.5" data-duration="0.07" data-track-index="26" data-volume="0.22" src="assets/audio/sfx-tick.wav"></audio>
+      </div>
+    </div>
+
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---------- 01 · ouverture ---------- */
+      tl.fromTo("#s1-eyebrow", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.15);
+      tl.fromTo("#s1-l1", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.3);
+      tl.fromTo("#s1-l2", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.46);
+      tl.fromTo("#s1-l3", { opacity: 0, y: 70, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: "power3.out" }, 0.62);
+      tl.fromTo("#s1-sub", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 1.05);
+      tl.fromTo("#s1-c1", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 1.35);
+      tl.fromTo("#s1-c2", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 1.45);
+      tl.fromTo("#s1-c3", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 1.55);
+      tl.fromTo("#s1-c4", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 1.65);
+      tl.fromTo("#s1-hero", { scale: 1 }, { scale: 1.035, duration: 6.4, ease: "none" }, 0.2);
+      tl.to("#s1-eyebrow, #s1-hero, #s1-grid", { opacity: 0, duration: 0.5, ease: "power1.in" }, 6.35);
+
+      /* ---------- 02 · portail ---------- */
+      tl.fromTo("#s2-top", { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 7.2);
+      tl.fromTo("#s2-eyebrow", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 7.35);
+      tl.fromTo("#s2-title1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.85, ease: "power3.out" }, 7.5);
+      tl.fromTo("#s2-title2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.85, ease: "power3.out" }, 7.68);
+      tl.fromTo("#s2-p1", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 8.15);
+      tl.fromTo("#s2-p2", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 8.27);
+      tl.fromTo("#s2-p3", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 8.39);
+      tl.fromTo("#s2-p4", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 8.51);
+      tl.fromTo("#s2-chips .chip", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.09, ease: "power2.out" }, 9.25);
+      tl.fromTo("#s2-list", { y: 0 }, { y: -26, duration: 5.4, ease: "none" }, 8.8);
+      tl.to("#s2-top, #s2-eyebrow, #s2-title1, #s2-title2, #s2-list, #s2-chips", { opacity: 0, duration: 0.45, ease: "power1.in" }, 15.0);
+
+      /* ---------- 03 · creator ---------- */
+      tl.fromTo("#s3-label", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 15.72);
+      tl.fromTo("#s3-title .display", { opacity: 0, y: 54 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.14, ease: "power3.out" }, 15.9);
+      tl.fromTo("#s3-field-wrap", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" }, 16.4);
+      tl.fromTo(
+        "#s3 .player",
+        { opacity: 0, scale: 0.6 },
+        { opacity: 1, scale: 1, duration: 0.45, stagger: 0.055, ease: "back.out(1.8)" },
+        16.95
+      );
+      tl.fromTo("#s3-tags .chip", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1, ease: "power2.out" }, 19.4);
+      tl.fromTo("#s3-toast", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 22.7);
+      tl.fromTo("#s3-toast .ok", { scale: 0.5 }, { scale: 1, duration: 0.5, ease: "back.out(2.4)" }, 22.85);
+      tl.to("#s3-label, #s3-title, #s3-field-wrap, #s3-tags, #s3-toast", { opacity: 0, duration: 0.45, ease: "power1.in" }, 26.05);
+
+      /* ---------- 04 · publisher ---------- */
+      tl.fromTo("#s4-label", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 26.72);
+      tl.fromTo("#s4-title .display", { opacity: 0, y: 54 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.14, ease: "power3.out" }, 26.9);
+      tl.fromTo("#s4-msg", { opacity: 0, y: 46 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 27.45);
+      tl.fromTo("#s4-text", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 28.05);
+      tl.fromTo("#s4-embed", { opacity: 0, x: -18 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 28.45);
+      tl.fromTo("#s4-l1", { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 31.55);
+      tl.fromTo("#s4-l2", { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 31.85);
+      tl.fromTo("#s4-composer", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 33.5);
+      tl.to("#s4-label, #s4-title, #s4-msg, #s4-log, #s4-composer", { opacity: 0, duration: 0.45, ease: "power1.in" }, 37.0);
+
+      /* ---------- 05 · mercato ---------- */
+      const count = { v: 0 };
+      tl.fromTo("#s5-label", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 37.72);
+      tl.fromTo("#s5-title .display", { opacity: 0, y: 54 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.14, ease: "power3.out" }, 37.9);
+      tl.fromTo("#s5-big", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 38.35);
+      tl.to(
+        count,
+        {
+          v: 48,
+          duration: 1.9,
+          ease: "power2.out",
+          snap: { v: 1 },
+          onUpdate: () => {
+            document.getElementById("mercato-count").textContent = String(Math.round(count.v));
+          },
+        },
+        38.55
+      );
+      tl.fromTo("#s5-stats .chip", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.09, ease: "power2.out" }, 40.6);
+      tl.fromTo("#s5-r1", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 42.4);
+      tl.fromTo("#s5-r2", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 43.1);
+      tl.fromTo("#s5-r3", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 43.8);
+      tl.fromTo("#s5-r4", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 44.5);
+      tl.fromTo("#s5-export .chip", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1, ease: "power2.out" }, 46.9);
+      tl.to("#s5-label, #s5-title, #s5-big, #s5-stats, #s5 .rows, #s5-export", { opacity: 0, duration: 0.45, ease: "power1.in" }, 50.0);
+
+      /* ---------- 06 · mipmap ---------- */
+      tl.fromTo("#s6-label", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 50.72);
+      tl.fromTo("#s6-title .display", { opacity: 0, y: 54 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.14, ease: "power3.out" }, 50.9);
+      tl.fromTo("#s6-map", { opacity: 0, scale: 0.965 }, { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" }, 51.5);
+      tl.fromTo("#s6 .chunk", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.45, stagger: 0.08, ease: "power3.out" }, 51.9);
+      tl.fromTo("#s6-pin1", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 53.5);
+      tl.fromTo("#s6-pin2", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 53.8);
+      tl.fromTo("#s6-pin3", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 54.1);
+      tl.fromTo("#s6-hud .hud", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power2.out" }, 54.6);
+      tl.fromTo("#s6-tags .chip", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1, ease: "power2.out" }, 56.0);
+      tl.to("#s6-label, #s6-title, #s6-map, #s6-tags", { opacity: 0, duration: 0.45, ease: "power1.in" }, 60.0);
+
+      /* ---------- 07 · sortie ---------- */
+      tl.fromTo("#s7-mark", { opacity: 0, scale: 0.75 }, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.9)" }, 60.75);
+      tl.fromTo("#s7-wm", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 61.05);
+      tl.fromTo("#s7-title1", { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 61.25);
+      tl.fromTo("#s7-title2", { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 61.45);
+      tl.fromTo("#s7 .tile", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.08, ease: "power2.out" }, 61.95);
+      tl.fromTo("#s7-cmd", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 62.5);
+      tl.to("#fade", { opacity: 1, duration: 0.9, ease: "power1.in" }, 69.4);
+      tl.to("#s7-center, #s7-cmd", { opacity: 0, duration: 0.6, ease: "power1.in" }, 69.5);
+
+      tl.seek(0);
+      window.__timelines["istan"] = tl;
+    </script>
+  </body>
+</html>

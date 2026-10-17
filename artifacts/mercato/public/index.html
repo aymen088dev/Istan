@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0a0c0a">
+    <title>Mercato Analyser — ISTAN Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="mercato.css">
+</head>
+
+<body>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="masthead">
+        <a class="masthead-brand" href="/">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span class="brand-text">
+                <strong>Mercato</strong>
+                <small>Analyser · ISTAN Projects</small>
+            </span>
+        </a>
+        <nav class="masthead-nav" aria-label="Navigation">
+            <a href="/">Portail</a>
+            <a href="#analyse">Analyse</a>
+            <a href="#transferts">Transferts</a>
+        </nav>
+        <div class="masthead-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusLabel">Vérification du serveur…</span>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero" id="analyse">
+            <div class="hero-copy">
+                <p class="eyebrow">Salon <span class="mono" id="channelIdLabel">1465801451971412219</span></p>
+                <h1>Quatre mois de messages.<br><em>Une liste de transferts.</em></h1>
+                <p class="hero-lead">
+                    L'analyseur relit l'historique du salon mercato, écarte les rumeurs et les débats,
+                    puis ne garde que les transferts individuels réellement annoncés : joueur, club quitté,
+                    club rejoint, montant et date.
+                </p>
+                <div class="hero-facts">
+                    <div class="fact">
+                        <strong id="windowFact">4 mois</strong>
+                        <span>d'historique</span>
+                    </div>
+                    <div class="fact">
+                        <strong id="messagesFact">—</strong>
+                        <span>messages lus</span>
+                    </div>
+                    <div class="fact">
+                        <strong id="transfersFact">—</strong>
+                        <span>transferts retenus</span>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="control-card" aria-label="Lancer l'analyse">
+                <div class="control-head">
+                    <span class="control-kicker">Nouvelle analyse</span>
+                    <span class="badge" id="lastRunBadge">Jamais lancée</span>
+                </div>
+                <label class="field" for="monthsSelect">
+                    <span>Profondeur</span>
+                    <div class="select-wrap">
+                        <select id="monthsSelect">
+                            <option value="1">1 mois</option>
+                            <option value="2">2 mois</option>
+                            <option value="3">3 mois</option>
+                            <option value="4" selected>4 mois</option>
+                            <option value="5">5 mois</option>
+                            <option value="6">6 mois</option>
+                        </select>
+                        <span class="select-arrow" aria-hidden="true">▾</span>
+                    </div>
+                </label>
+
+                <div class="config-list">
+                    <div class="config-row">
+                        <span class="config-name">Token Discord</span>
+                        <span class="config-state" id="tokenState">—</span>
+                    </div>
+                    <div class="config-row">
+                        <span class="config-name">Clé Groq</span>
+                        <span class="config-state" id="groqState">—</span>
+                    </div>
+                </div>
+
+                <button class="run-button" id="analyzeButton" type="button">
+                    <span id="analyzeLabel">Lancer l'analyse</span>
+                    <span class="run-arrow" aria-hidden="true">↗</span>
+                </button>
+                <p class="control-note" id="controlNote">
+                    Le salon est lu en lecture seule. Aucun message n'est envoyé.
+                </p>
+
+                <div class="progress-block" id="progressBlock" hidden>
+                    <div class="progress-head">
+                        <span id="phaseLabel">Préparation…</span>
+                        <span class="mono" id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-track"><span id="progressBar"></span></div>
+                    <div class="progress-stats mono">
+                        <span><b id="statFetched">0</b> lus</span>
+                        <span><b id="statKept">0</b> texte</span>
+                        <span><b id="statBatches">0/0</b> lots</span>
+                        <span><b id="statTransfers">0</b> transferts</span>
+                    </div>
+                </div>
+
+                <p class="control-error" id="jobError" hidden></p>
+            </aside>
+        </section>
+
+        <section class="results" id="transferts" aria-live="polite">
+            <div class="results-head">
+                <div>
+                    <p class="eyebrow">Rapport</p>
+                    <h2>Transferts annoncés</h2>
+                    <p class="results-sub" id="reportWindow">Aucune analyse enregistrée pour l'instant.</p>
+                </div>
+                <div class="results-actions">
+                    <button class="ghost-button" id="exportCsv" type="button" disabled>CSV</button>
+                    <button class="ghost-button" id="exportJson" type="button" disabled>JSON</button>
+                </div>
+            </div>
+
+            <div class="summary-strip" id="summaryStrip" hidden>
+                <div class="summary-cell">
+                    <span>Transferts</span>
+                    <strong id="summaryTransfers">0</strong>
+                </div>
+                <div class="summary-cell">
+                    <span>Joueurs</span>
+                    <strong id="summaryPlayers">0</strong>
+                </div>
+                <div class="summary-cell">
+                    <span>Clubs cités</span>
+                    <strong id="summaryClubs">0</strong>
+                </div>
+                <div class="summary-cell">
+                    <span>Messages analysés</span>
+                    <strong id="summaryMessages">0</strong>
+                </div>
+                <div class="summary-cell summary-wide">
+                    <span>Fenêtre couverte</span>
+                    <strong id="summaryWindow">—</strong>
+                </div>
+            </div>
+
+            <div class="filters" id="filters" hidden>
+                <label class="search-box" for="searchInput">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
+                    <input id="searchInput" type="search" placeholder="Joueur, club, montant…" autocomplete="off">
+                </label>
+                <label class="club-box" for="clubSelect">
+                    <span class="sr-only">Filtrer par club</span>
+                    <select id="clubSelect">
+                        <option value="">Tous les clubs</option>
+                    </select>
+                </label>
+                <div class="type-row" id="typeFilters" role="group" aria-label="Type de transfert"></div>
+                <span class="result-count mono" id="resultCount"></span>
+            </div>
+
+            <div class="table-wrap" id="tableWrap" hidden>
+                <table class="transfer-table">
+                    <thead>
+                        <tr>
+                            <th class="col-date">Date</th>
+                            <th>Joueur</th>
+                            <th>Mouvement</th>
+                            <th class="col-fee">Montant</th>
+                            <th class="col-type">Type</th>
+                            <th class="col-source"><span class="sr-only">Source</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="transfersBody"></tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <div class="empty-mark" aria-hidden="true">↗</div>
+                <h3>La liste se construit à partir du salon.</h3>
+                <p>
+                    Clique sur <strong>Lancer l'analyse</strong> : le serveur récupère les messages des
+                    quatre derniers mois, les fait lire par lots, puis dédoublonne les annonces d'un même
+                    transfert.
+                </p>
+                <p class="empty-hint">
+                    Prérequis : le bot doit être membre du serveur, voir le salon
+                    <span class="mono">1465801451971412219</span> et lire son historique.
+                </p>
+            </div>
+
+            <p class="results-note" id="resultsNote" hidden></p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>Mercato Analyser · ISTAN Projects</span>
+        <span class="mono">Lecture seule · Groq</span>
+    </footer>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="mercato.js"></script>
+</body>
+
+</html>

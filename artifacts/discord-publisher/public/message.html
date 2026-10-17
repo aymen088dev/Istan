@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Éditeur de message — Discord Publisher</title>
+
+    <link
+        rel="stylesheet"
+        href="message.css"
+    >
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         APPLICATION
+    ====================================================== -->
+
+    <main class="message-app">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="message-header">
+
+            <div class="header-left">
+
+                <button
+                    type="button"
+                    class="back-button"
+                    id="backButton"
+                    aria-label="Retour"
+                >
+                    ←
+                </button>
+
+
+                <div>
+
+                    <div class="header-title">
+                        Éditeur avancé
+                    </div>
+
+                    <div class="header-subtitle">
+                        Créez et personnalisez votre message Discord
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="resetButton"
+                >
+                    Réinitialiser
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="publishButton"
+                >
+                    Publier
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             CONTENU PRINCIPAL
+        ================================================== -->
+
+        <div class="editor-layout">
+
+
+            <!-- =============================================
+                 COLONNE ÉDITEUR
+            ============================================== -->
+
+            <section class="editor-column">
+
+
+                <!-- =========================================
+                     DESTINATION
+                ========================================== -->
+
+                <section class="editor-section">
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <div class="section-title">
+                                Destination
+                            </div>
+
+                            <div class="section-description">
+                                Choisissez le profil et le webhook utilisés pour publier.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="destination-grid">
+
+
+                        <!-- PROFIL -->
+
+                        <div class="field">
+
+                            <label
+                                for="profileSelect"
+                                class="field-label"
+                            >
+                                Profil
+                            </label>
+
+                            <select
+                                id="profileSelect"
+                                class="field-input"
+                            >
+
+                                <option value="">
+                                    Sélectionner un profil
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- WEBHOOK -->
+
+                        <div class="field">
+
+                            <label
+                                for="webhookSelect"
+                                class="field-label"
+                            >
+                                Webhook
+                            </label>
+
+                            <select
+                                id="webhookSelect"
+                                class="field-input"
+                            >
+
+                                <option value="">
+                                    Sélectionner un webhook
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================================
+                     CONTENU
+                ========================================== -->
+
+                <section class="editor-section">
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <div class="section-title">
+                                Contenu
+                            </div>
+
+                            <div class="section-description">
+                                Écrivez le contenu principal de votre publication.
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="character-counter"
+                            id="characterCounter"
+                        >
+                            0 / 2000
+                        </div>
+
+                    </div>
+
+
+                    <div class="message-editor">
+
+                        <textarea
+                            id="messageContent"
+                            maxlength="2000"
+                            placeholder="Écrivez votre message..."
+                            spellcheck="true"
+                        ></textarea>
+
+
+                        <div class="editor-toolbar">
+
+                            <div class="toolbar-left">
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="bold"
+                                    title="Gras"
+                                >
+                                    <strong>B</strong>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="italic"
+                                    title="Italique"
+                                >
+                                    <em>I</em>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="underline"
+                                    title="Souligné"
+                                >
+                                    <u>U</u>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="strike"
+                                    title="Barré"
+                                >
+                                    <s>S</s>
+                                </button>
+
+                                <span class="toolbar-separator"></span>
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="code"
+                                    title="Code"
+                                >
+                                    &lt;/&gt;
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="spoiler"
+                                    title="Spoiler"
+                                >
+                                    ▫
+                                </button>
+
+                            </div>
+
+
+                            <div class="toolbar-right">
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="emoji"
+                                    title="Emoji"
+                                >
+                                    ☺
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="toolbar-button"
+                                    data-action="mention"
+                                    title="Mention"
+                                >
+                                    @
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="format-help">
+
+                        <span>
+                            Markdown Discord :
+                        </span>
+
+                        <code>**gras**</code>
+                        <code>*italique*</code>
+                        <code>__souligné__</code>
+                        <code>~~barré~~</code>
+                        <code>`code`</code>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================================
+                     MÉDIAS
+                ========================================== -->
+
+                <section class="editor-section">
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <div class="section-title">
+                                Médias
+                            </div>
+
+                            <div class="section-description">
+                                Ajoutez jusqu'à 4 images ou fichiers.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="media-grid"
+                        id="mediaGrid"
+                    >
+
+                        <button
+                            type="button"
+                            class="media-add"
+                            id="addMediaButton"
+                        >
+
+                            <span class="media-add-icon">
+                                +
+                            </span>
+
+                            <span>
+                                Ajouter un média
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <input
+                        type="file"
+                        id="mediaInput"
+                        multiple
+                        accept="image/*"
+                        hidden
+                    >
+
+                </section>
+
+
+
+                <!-- =========================================
+                     OPTIONS
+                ========================================== -->
+
+                <section class="editor-section">
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <div class="section-title">
+                                Options
+                            </div>
+
+                            <div class="section-description">
+                                Personnalisez le comportement du message.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="options-list">
+
+
+                        <label class="option">
+
+                            <div class="option-info">
+
+                                <span class="option-title">
+                                    Afficher un aperçu
+                                </span>
+
+                                <span class="option-description">
+                                    Affiche le rendu Discord dans la prévisualisation.
+                                </span>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="previewEnabled"
+                                checked
+                            >
+
+                        </label>
+
+
+                        <label class="option">
+
+                            <div class="option-info">
+
+                                <span class="option-title">
+                                    Afficher les médias
+                                </span>
+
+                                <span class="option-description">
+                                    Inclut les images dans l'aperçu du message.
+                                </span>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="mediaPreviewEnabled"
+                                checked
+                            >
+
+                        </label>
+
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================================
+                     ACTIONS
+                ========================================== -->
+
+                <div class="bottom-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="cancelButton"
+                    >
+                        Annuler
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary publish-large"
+                        id="publishButtonBottom"
+                    >
+                        Publier le message
+                    </button>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 COLONNE PRÉVISUALISATION
+            ============================================== -->
+
+            <aside class="preview-column">
+
+
+                <div class="preview-header">
+
+                    <div>
+
+                        <div class="preview-title">
+                            Prévisualisation
+                        </div>
+
+                        <div class="preview-subtitle">
+                            Aperçu du rendu Discord
+                        </div>
+
+                    </div>
+
+
+                    <span
+                        class="preview-status"
+                        id="previewStatus"
+                    >
+                        EN DIRECT
+                    </span>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     DISCORD PREVIEW
+                ========================================== -->
+
+                <div class="discord-preview">
+
+                    <div class="discord-preview-channel">
+
+                        <span class="channel-hash">
+                            #
+                        </span>
+
+                        <span id="previewChannel">
+                            général
+                        </span>
+
+                    </div>
+
+
+                    <div class="discord-preview-messages">
+
+                        <article class="discord-preview-message">
+
+
+                            <!-- AVATAR -->
+
+                            <div
+                                class="preview-avatar"
+                                id="previewAvatar"
+                            >
+                                <span id="previewAvatarLetter">
+                                    ?
+                                </span>
+
+                                <img
+                                    id="previewAvatarImage"
+                                    alt=""
+                                    hidden
+                                >
+
+                            </div>
+
+
+                            <!-- MESSAGE BODY -->
+
+                            <div class="preview-message-body">
+
+
+                                <div class="preview-message-header">
+
+                                    <span
+                                        class="preview-author"
+                                        id="previewAuthor"
+                                    >
+                                        Nom du profil
+                                    </span>
+
+
+                                    <span
+                                        class="preview-bot-badge"
+                                    >
+                                        APP
+                                    </span>
+
+
+                                    <span class="preview-date">
+                                        aujourd'hui à 14:11
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="preview-content"
+                                    id="previewContent"
+                                >
+                                    Votre message apparaîtra ici.
+                                </div>
+
+
+                                <!-- MÉDIAS -->
+
+                                <div
+                                    class="preview-attachments"
+                                    id="previewAttachments"
+                                ></div>
+
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     INFOS
+                ========================================== -->
+
+                <div class="preview-info">
+
+                    <div class="info-title">
+                        Conseils
+                    </div>
+
+                    <ul>
+
+                        <li>
+                            Utilisez <strong>**gras**</strong> pour mettre un élément en évidence.
+                        </li>
+
+                        <li>
+                            Les retours à la ligne sont conservés.
+                        </li>
+
+                        <li>
+                            Discord limite le contenu d'un message à 2000 caractères.
+                        </li>
+
+                        <li>
+                            Vous pouvez ajouter jusqu'à 4 médias.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         TOASTS
+    ====================================================== -->
+
+    <div
+        id="toastContainer"
+        class="toast-container"
+        aria-live="polite"
+    ></div>
+
+
+
+    <!-- =====================================================
+         CONFIRMATION PUBLICATION
+    ====================================================== -->
+
+    <div
+        id="publishModal"
+        class="modal"
+        hidden
+    >
+
+        <div
+            class="modal-backdrop"
+            data-close-modal
+        ></div>
+
+
+        <div
+            class="modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="publishModalTitle"
+        >
+
+            <div class="modal-header">
+
+                <div>
+
+                    <div
+                        class="modal-title"
+                        id="publishModalTitle"
+                    >
+                        Publier le message ?
+                    </div>
+
+                    <div class="modal-description">
+                        Le message sera envoyé immédiatement sur Discord.
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    data-close-modal
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="modal-preview">
+
+                <div
+                    class="modal-preview-avatar"
+                    id="modalPreviewAvatar"
+                >
+                    ?
+                </div>
+
+
+                <div>
+
+                    <div
+                        class="modal-preview-author"
+                        id="modalPreviewAuthor"
+                    >
+                        Profil
+                    </div>
+
+                    <div
+                        class="modal-preview-text"
+                        id="modalPreviewText"
+                    >
+                        Message
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-close-modal
+                >
+                    Annuler
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="confirmPublishButton"
+                >
+                    Confirmer la publication
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script src="message.js"></script>
+
+</body>
+
+
+
+</html>
